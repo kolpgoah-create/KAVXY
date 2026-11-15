@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="my" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title id="pageTitle">KAVXY - Mobile Game Hub</title>
+
+  <!-- PWA & Mobile Web App Meta Tags -->
+  <meta name="theme-color" content="#090d16" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="KAVXY" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: { 400: '#38bdf8', 500: '#0ea5e9', 600: '#0284c7' },
+            accent: { 400: '#f59e0b', 500: '#d97706' },
+            reseller: { 400: '#fbbf24', 500: '#f59e0b', 600: '#d97706' }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Icons & Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Padauk:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Outfit', 'Padauk', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      transition: background 0.4s ease, color 0.4s ease;
+    }
+    .banner-slide {
+      transition: all 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    #seasonalCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 25;
+    }
+    body.theme-general {
+      background: radial-gradient(circle at 50% 10%, #172b4c 0%, #0b1528 60%, #090d16 100%) !important;
+    }
+    body.theme-summer {
+      background: radial-gradient(circle at 50% 10%, #3d2003 0%, #170d03 55%, #090602 100%) !important;
+    }
+    body.theme-rainy {
+      background: radial-gradient(circle at 50% 10%, #0f2b38 0%, #071922 60%, #030d12 100%) !important;
+    }
+    body.theme-winter {
+      background: radial-gradient(circle at 50% 10%, #0c2744 0%, #061526 55%, #020912 100%) !important;
+    }
+    body.theme-thingyan {
+      background: radial-gradient(circle at 50% 12%, #382405 0%, #0d2d3e 50%, #04141c 100%) !important;
+    }
+    body.theme-thadingyut {
+      background: radial-gradient(circle at 50% 10%, #341a06 0%, #150901 60%, #080300 100%) !important;
+    }
+    .owl-sprite {
+      display: inline-block;
+      width: 22px;
+      height: 22px;
+      aspect-ratio: 1 / 1;
+      background-image: url('1000015288_2.png'), url('1000015288.png');
+      background-size: 300% 500%;
+      background-repeat: no-repeat;
+      vertical-align: middle;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+      flex-shrink: 0;
+    }
+    .owl-lvl-1  { background-position: 0% 0%; }
+    .owl-lvl-2  { background-position: 50% 0%; }
+    .owl-lvl-3  { background-position: 100% 0%; }
+    .owl-lvl-4  { background-position: 0% 25%; }
+    .owl-lvl-5  { background-position: 50% 25%; }
+    .owl-lvl-6  { background-position: 100% 25%; }
+    .owl-lvl-7  { background-position: 0% 50%; }
+    .owl-lvl-8  { background-position: 50% 50%; }
+    .owl-lvl-9  { background-position: 100% 50%; }
+    .owl-lvl-10 { background-position: 50% 75%; }
+    .owl-lvl-11 { background-position: 50% 100%; }
+
+    @keyframes wiggle {
+      0%, 100% { transform: rotate(0deg); }
+      20%, 60% { transform: rotate(-15deg); }
+      40%, 80% { transform: rotate(15deg); }
+    }
+    .animate-wiggle {
+      animation: wiggle 0.6s ease infinite;
+    }
+    .snap-x-mandatory {
+      scroll-snap-type: x mandatory;
+    }
+    .snap-card {
+      scroll-snap-align: center;
+      flex-shrink: 0;
+    }
+
+    /* Rocket connection status — replaces an endless loading spinner */
+    #rocketOfflineOverlay { position:fixed; inset:0; z-index:99999999; display:none; align-items:center; justify-content:center; padding:24px; background:rgba(5,10,23,.94); backdrop-filter:blur(14px); }
+    #rocketOfflineOverlay.is-visible { display:flex; }
+    .rocket-panel { width:min(100%,340px); padding:34px 24px; text-align:center; border-radius:28px; background:linear-gradient(155deg,#16243d,#0a1020); border:1px solid rgba(125,211,252,.23); box-shadow:0 24px 70px rgba(0,0,0,.45); color:white; }
+    .rocket-stage { height:185px; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; isolation:isolate; }
+    .rocket-globe { position:absolute; font-size:79px; color:#38bdf8; filter:drop-shadow(0 0 20px rgba(14,165,233,.6)); animation:globePulse 3s ease-in-out infinite; }
+    .rocket-orbit { position:absolute; width:155px; height:155px; border:1.5px dashed rgba(125,211,252,.45); border-radius:50%; transform:rotate(-25deg); }
+    .rocket-orbit-spinner { position:absolute; width:155px; height:155px; animation:rocketOrbit 3.2s linear infinite; }
+    .rocket-orbit-ship { position:absolute; top:-17px; left:calc(50% - 18px); width:36px; height:36px; display:grid; place-items:center; color:#fbbf24; font-size:30px; filter:drop-shadow(0 0 8px rgba(251,191,36,.7)); transform:rotate(45deg); }
+    .rocket-orbit-ship::after { content:''; position:absolute; width:8px; height:18px; left:4px; top:23px; background:linear-gradient(#f97316,#facc15,transparent); border-radius:80%; transform:rotate(35deg); animation:rocketFlame .4s ease-in-out infinite alternate; }
+    .rocket-star { position:absolute; color:#bae6fd; font-size:10px; opacity:.65; }
+    .rocket-star.one { top:25px;left:30px } .rocket-star.two { right:29px;bottom:31px } .rocket-star.three { top:40px;right:46px }
+    @keyframes rocketOrbit { from {transform:rotate(0deg)} to {transform:rotate(360deg)} }
+    @keyframes globePulse { 50% {filter:drop-shadow(0 0 30px rgba(14,165,233,.95));transform:scale(1.04)} }
+    @keyframes rocketFlame { from {opacity:.45;scale:.8} to {opacity:1;scale:1.15} }
+    @media (prefers-reduced-motion:reduce) { .rocket-orbit-spinner,.rocket-globe,.rocket-orbit-ship::after {animation:none} }
+  </style>
+</head>
+
+<body class="bg-[#f4f6fa] dark:bg-[#090d16] text-slate-800 dark:text-gray-100 min-h-screen transition-colors duration-300 pb-24 overflow-x-hidden select-none">
+
+
+  <!-- Offline / cloud connection rocket animation -->
+  <div id="rocketOfflineOverlay" role="alertdialog" aria-modal="true" aria-labelledby="rocketOfflineTitle" aria-describedby="rocketOfflineMessage" aria-hidden="true">
+    <div class="rocket-panel">
+      <div class="rocket-stage" aria-hidden="true">
+        <i class="fa-solid fa-star rocket-star one"></i><i class="fa-solid fa-star rocket-star two"></i><i class="fa-solid fa-star rocket-star three"></i>
+        <div class="rocket-orbit"></div><i class="fa-solid fa-earth-asia rocket-globe"></i>
+        <div class="rocket-orbit-spinner"><span class="rocket-orbit-ship"><i class="fa-solid fa-rocket"></i></span></div>
+      </div>
+      <h2 id="rocketOfflineTitle" style="font-weight:900;font-size:19px;margin:12px 0">ချိတ်ဆက်မှု ပြတ်တောက်နေပါသည်</h2>
+      <p id="rocketOfflineMessage" style="font-size:13px;line-height:1.8;color:#cbd5e1;margin:0 0 18px">အင်တာနက်ချိတ်ဆက်မှုကို စောင့်ဆိုင်းနေပါသည်…</p>
+      <button id="rocketRetryButton" type="button" onclick="retryRocketConnection()" style="border:0;border-radius:14px;padding:12px 22px;background:#0284c7;color:white;font-weight:800;cursor:pointer">🚀 ပြန်ချိတ်ဆက်မည်</button>
+    </div>
+  </div>
+
+  <!-- Seasonal Particle Canvas -->
+  <canvas id="seasonalCanvas"></canvas>
+
+  <!-- ==================== ၁။ ADMIN မှ လွှင့်တင်မည့် NEW VERSION DOWNLOAD ALERT ==================== -->
+  <div id="updateAlertModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[9999999] hidden flex items-center justify-center p-4">
+    <div class="bg-[#0e1629] border border-sky-500/40 max-w-xs w-full rounded-[32px] p-5 text-center space-y-4 shadow-2xl relative overflow-hidden animate-in fade-in zoom-in-95">
+      <div class="w-16 h-16 rounded-3xl bg-sky-500/20 text-sky-400 border border-sky-500/30 flex items-center justify-center text-2xl mx-auto shadow-inner">
+        <i class="fa-solid fa-cloud-arrow-down animate-bounce"></i>
+      </div>
+
+      <div class="space-y-1">
+        <span class="px-2.5 py-0.5 rounded-full bg-sky-500/20 text-sky-400 text-[9px] font-black uppercase tracking-wider">
+          New Version Update
+        </span>
+        <h3 class="text-sm font-black text-white" id="updateModalTitle">ဗားရှင်းအသစ် ရရှိနေပါပြီ</h3>
+        <p class="text-[11px] text-slate-300 leading-relaxed" id="updateNoticeText">
+          ပိုမိုကောင်းမွန်မြန်ဆန်သော စနစ်သစ်သို့ အဆင့်မြှင့်တင်ရန် ဒေါင်းလုဒ်ရယူပါ။
+        </p>
+      </div>
+
+      <!-- ဒေါင်းလုဒ် ပြေးနေသည့် PROGRESS BAR -->
+      <div id="downloadSection" class="hidden space-y-1.5 p-3 rounded-2xl bg-black/50 border border-white/5">
+        <div class="flex items-center justify-between text-[10px] font-bold">
+          <span class="text-sky-400 flex items-center gap-1.5">
+            <i class="fa-solid fa-spinner animate-spin"></i> ဖိုင်များ ဒေါင်းလုဒ်ဆွဲနေပါသည်...
+          </span>
+          <span id="downloadPercent" class="text-white font-mono">0%</span>
+        </div>
+        <div class="w-full h-2 rounded-full bg-white/10 overflow-hidden">
+          <div id="downloadProgressBar" class="h-full bg-gradient-to-r from-sky-500 to-emerald-400 rounded-full w-0 transition-all duration-150"></div>
+        </div>
+      </div>
+
+      <div class="space-y-2 pt-1">
+        <button onclick="startUpdateDownload()" id="btnStartUpdate" class="w-full py-3 rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 text-white font-black text-xs shadow-lg shadow-sky-500/30 transition active:scale-95 flex items-center justify-center gap-2">
+          <i class="fa-solid fa-rocket"></i>
+          <span>နောက်ဆုံး Update သို့ သွားရန်</span>
+        </button>
+        <button onclick="dismissUpdate()" class="w-full py-1.5 text-[10px] text-slate-400 hover:text-white transition">
+          နောက်မှ ပြုလုပ်မည် (Later)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- APP INSTALL GUIDE MODAL -->
+  <div id="appInstallGuideModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[999999] hidden flex items-center justify-center p-4" onclick="closeAppGuideModal()">
+    <div class="bg-[#0e1629] border border-blue-500/40 max-w-xs w-full rounded-[32px] p-5 text-center space-y-4 shadow-2xl animate-in fade-in zoom-in-95" onclick="event.stopPropagation()">
+      <div class="w-14 h-14 rounded-2xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-2xl mx-auto shadow-inner border border-blue-500/30">
+        <i class="fa-solid fa-mobile-screen-button animate-bounce"></i>
+      </div>
+      <div class="space-y-1.5">
+        <h3 class="text-xs font-black text-white">App အဖြစ် ဖုန်းထဲထည့်သွင်းနည်း</h3>
+        <p class="text-[11px] text-slate-300 leading-relaxed">
+          သင့် Browser အပေါ်ထောင့်ရှိ <strong class="text-amber-400">မီနူး (⋮ သို့မဟုတ် Share)</strong> ကို နှိပ်ပြီး <strong class="text-blue-400">"Install app"</strong> သို့မဟုတ် <strong class="text-blue-400">"Add to Home screen"</strong> ကို ရွေးချယ်၍ App အဖြစ် တိုက်ရိုက် ထည့်သွင်းအသုံးပြုနိုင်ပါသည်။
+        </p>
+      </div>
+      <button onclick="closeAppGuideModal()" class="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs shadow-md shadow-blue-600/30 transition active:scale-95">
+        နားလည်ပါပြီ
+      </button>
+    </div>
+  </div>
+
+  <!-- ဝင်ရောက်လာချိန် ပေါ်လာမည့် ALERT (BOX ၃ ခု) -->
+  <div id="welcomeAlertModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[99999] hidden flex items-center justify-center p-4 transition-all duration-300">
+    <div class="bg-[#0e1629] border border-white/10 w-full max-w-sm rounded-[32px] p-5 shadow-2xl space-y-4 relative overflow-hidden animate-in fade-in zoom-in-95">
+      <div class="flex items-center justify-between border-b border-white/10 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-sm font-bold shadow-inner">
+            <i class="fa-solid fa-fire animate-pulse"></i>
+          </span>
+          <div>
+            <h3 class="text-xs font-black text-white">အထူးသတင်းနှင့် Event များ</h3>
+            <span class="text-[9px] text-slate-400">ဘေးတိုက်ဆွဲ၍ ကြည့်ရှုနိုင်ပါသည်</span>
+          </div>
+        </div>
+        <button onclick="closeWelcomeAlert()" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500 text-slate-400 hover:text-white flex items-center justify-center transition active:scale-90" title="ပိတ်မည်">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <div class="relative">
+        <div id="eventScrollContainer" onscroll="handleEventScroll()" class="flex gap-3 overflow-x-auto snap-x-mandatory hide-scrollbar py-1">
+          <!-- Box 1 -->
+          <div class="snap-card w-[86%] rounded-2xl bg-gradient-to-b from-blue-600/30 via-slate-900 to-[#0e1629] border border-blue-500/30 p-3.5 space-y-2.5 shadow-lg flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="px-2 py-0.5 rounded-full bg-blue-500 text-white text-[9px] font-black uppercase">HOT PROMO</span>
+                <span class="text-[10px] text-slate-400">1 / 3</span>
+              </div>
+              <div class="w-full h-28 rounded-xl overflow-hidden mb-2 bg-slate-800">
+                <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=500&auto=format&fit=crop" class="w-full h-full object-cover" alt="Event 1">
+              </div>
+              <h4 class="text-xs font-black text-white">MLBB စိန်ပရိုမိုးရှင်းကြီး</h4>
+              <p class="text-[11px] text-slate-300 leading-snug mt-1">
+                ရာသီဥတုအလိုက် အထူးလျှော့စျေးများဖြင့် စိန်များကို အမြန်ဆုံး ဖြည့်သွင်းနိုင်ပါပြီ။
+              </p>
+            </div>
+            <a href="payment.html" class="w-full py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold text-center block shadow transition">
+              အသေးစိတ် ကြည့်မည်
+            </a>
+          </div>
+
+          <!-- Box 2 -->
+          <div class="snap-card w-[86%] rounded-2xl bg-gradient-to-b from-amber-500/30 via-slate-900 to-[#0e1629] border border-amber-500/30 p-3.5 space-y-2.5 shadow-lg flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="px-2 py-0.5 rounded-full bg-amber-500 text-black text-[9px] font-black uppercase">PRE-ORDER</span>
+                <span class="text-[10px] text-slate-400">2 / 3</span>
+              </div>
+              <div class="w-full h-28 rounded-xl overflow-hidden mb-2 bg-slate-800">
+                <img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?w=500&auto=format&fit=crop" class="w-full h-full object-cover" alt="Event 2">
+              </div>
+              <h4 class="text-xs font-black text-white">Weekly Pass ကြိုတင်မှာယူမှု</h4>
+              <p class="text-[11px] text-slate-300 leading-snug mt-1">
+                ပစ္စည်းမကုန်မီ သက်သာသော စျေးနှုန်းဖြင့် ကြိုတင်စာရင်းပေး မှာယူနိုင်ပါပြီ။
+              </p>
+            </div>
+            <a href="Preorder.html" class="w-full py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black text-[11px] font-black text-center block shadow transition">
+              ကြိုတင်မှာယူမည်
+            </a>
+          </div>
+
+          <!-- Box 3 -->
+          <div class="snap-card w-[86%] rounded-2xl bg-gradient-to-b from-purple-600/30 via-slate-900 to-[#0e1629] border border-purple-500/30 p-3.5 space-y-2.5 shadow-lg flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="px-2 py-0.5 rounded-full bg-purple-500 text-white text-[9px] font-black uppercase">VIP TIER</span>
+                <span class="text-[10px] text-slate-400">3 / 3</span>
+              </div>
+              <div class="w-full h-28 rounded-xl overflow-hidden mb-2 bg-slate-800">
+                <img src="https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=500&auto=format&fit=crop" class="w-full h-full object-cover" alt="Event 3">
+              </div>
+              <h4 class="text-xs font-black text-white">ဇီးကွက် Badge အဆင့်မြှင့်တင်ခြင်း</h4>
+              <p class="text-[11px] text-slate-300 leading-snug mt-1">
+                သုံးစွဲငွေအလိုက် 11 Tiers ဇီးကွက်တံဆိပ်များနှင့် VIP အထူးလျှော့စျေးနှုန်းများ ရရှိမည်။
+              </p>
+            </div>
+            <a href="payment.html" class="w-full py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-[11px] font-bold text-center block shadow transition">
+              ငွေဖြည့်သွင်းမည်
+            </a>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-center gap-1.5 pt-2">
+          <span id="eventDot0" class="w-4 h-1.5 rounded-full bg-amber-500 transition-all duration-300"></span>
+          <span id="eventDot1" class="w-1.5 h-1.5 rounded-full bg-white/20 transition-all duration-300"></span>
+          <span id="eventDot2" class="w-1.5 h-1.5 rounded-full bg-white/20 transition-all duration-300"></span>
+        </div>
+      </div>
+
+      <div class="pt-1">
+        <button onclick="closeWelcomeAlert()" class="w-full py-2.5 rounded-xl bg-white/[0.05] hover:bg-white/10 text-slate-300 font-bold text-xs active:scale-95 transition flex items-center justify-center gap-2">
+          <span>တစ်ခါတည်း ပိတ်ထွက်မည် (Close)</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRE-MAINTENANCE OVERLAY SCREEN -->
+  <div id="maintenanceOverlay" class="fixed inset-0 bg-[#090d16]/95 backdrop-blur-xl z-50 hidden flex flex-col items-center justify-center p-6 text-center">
+    <div class="max-w-xs w-full space-y-4">
+      <div class="relative w-20 h-20 mx-auto flex items-center justify-center">
+        <div class="absolute inset-0 rounded-full bg-amber-500/20 animate-ping"></div>
+        <div class="w-16 h-16 rounded-3xl bg-gradient-to-tr from-amber-500 to-amber-600 text-white flex items-center justify-center text-2xl shadow-xl shadow-amber-500/30">
+          <i class="fa-solid fa-screwdriver-wrench animate-bounce"></i>
+        </div>
+      </div>
+      <div class="space-y-1.5">
+        <span class="inline-block px-3 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-500 text-[9px] font-black uppercase tracking-wider">
+          System Pre-Maintenance
+        </span>
+        <h2 class="text-base font-black text-white">စနစ် ကြိုတင်ပြင်ဆင်နေပါသည်</h2>
+        <p id="maintDisplayNotice" class="text-xs text-slate-400 leading-relaxed">
+          ပိုမိုကောင်းမွန်သော ဝန်ဆောင်မှု ပေးနိုင်ရန် ဆာဗာအား ခေတ္တ ပြင်ဆင်ထိန်းသိမ်းနေပါသည်။ မကြာမီ ပြန်လည်ဖွင့်လှစ်ပေးပါမည်။
+        </p>
+      </div>
+      <div id="maintEstTimeTag" class="hidden px-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/10 text-[11px] text-amber-400 font-mono">
+        <i class="fa-solid fa-clock mr-1"></i> ပြီးစီးမည့်အချိန်: <span id="maintEstTimeVal" class="text-white font-bold"></span>
+      </div>
+      <div class="pt-3 border-t border-white/10 text-left space-y-2">
+        <label class="text-[10px] font-semibold text-slate-400 block">Admin ကြိုတင်ဝင်စစ်ရန် Passcode:</label>
+        <div class="flex gap-2">
+          <input type="password" id="inputAdminBypass" placeholder="Passcode..." class="flex-1 px-3 py-2 rounded-xl bg-white/[0.05] border border-white/10 text-white text-xs outline-none focus:border-amber-500">
+          <button onclick="unlockAdminBypass()" class="px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-black font-bold text-xs active:scale-95 transition">
+            Unlock
+          </button>
+        </div>
+      </div>
+      <div class="pt-1">
+        <button onclick="checkMaintenanceLive()" class="w-full py-2.5 rounded-xl bg-white/[0.05] hover:bg-white/10 text-slate-300 font-bold text-[11px] active:scale-95 transition flex items-center justify-center gap-1.5">
+          <i class="fa-solid fa-rotate-right"></i>
+          <span>ပြန်လည်စစ်ဆေးမည် (Refresh)</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIDEBAR DRAWER -->
+  <div id="sidebarOverlay" onclick="toggleMenu()" class="fixed inset-0 bg-black/65 z-40 hidden backdrop-blur-sm transition-opacity"></div>
+  
+  <aside id="sidebar" class="fixed top-0 left-0 bottom-0 w-[270px] bg-white dark:bg-[#111827] border-r border-slate-200 dark:border-white/10 z-50 transform -translate-x-full transition-transform duration-300 ease-in-out p-5 flex flex-col justify-between">
+    <div>
+      <div class="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-white/10">
+        <div class="flex items-center gap-2.5 font-black text-xl text-brand-500 tracking-wider">
+          <div class="w-9 h-9 rounded-xl overflow-hidden border border-brand-500/30 bg-slate-800 flex items-center justify-center shadow-md shrink-0">
+            <img id="sidebarSiteLogo" src="" class="w-full h-full object-cover hidden" alt="Logo">
+            <div id="sidebarDefaultLogoIcon" class="w-full h-full bg-gradient-to-tr from-brand-500 to-sky-400 text-white flex items-center justify-center text-sm">
+              <i class="fa-solid fa-gamepad"></i>
+            </div>
+          </div>
+          <span id="sidebarSiteName" class="truncate">KAVXY</span>
+        </div>
+        <button onclick="toggleMenu()" class="w-8 h-8 rounded-xl flex items-center justify-center hover:bg-slate-100 dark:hover:bg-white/5 text-slate-500 dark:text-gray-400">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div id="sidebarUserBox" class="my-4 p-3 rounded-2xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/5 hidden">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full border border-brand-500 overflow-hidden shrink-0">
+            <img id="sidebarAvatarImg" src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=120&auto=format&fit=crop&q=80" class="w-full h-full object-cover" alt="Profile">
+          </div>
+          <div class="overflow-hidden">
+            <div class="font-bold text-xs truncate text-slate-900 dark:text-white flex items-center gap-1.5">
+              <span id="sidebarUserName">Player</span>
+              <span id="sidebarOwlBadge" class="owl-sprite owl-lvl-1"></span>
+              <span id="sidebarEmojiBadge" class="text-xs">💎</span>
+            </div>
+            <div class="text-[10px] text-emerald-500 font-bold" id="sidebarUserBalance">0 MMK</div>
+          </div>
+        </div>
+      </div>
+
+      <nav class="mt-3 flex flex-col gap-2 font-semibold text-xs">
+        <a href="index.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-brand-500/10 text-brand-500">
+          <i class="fa-solid fa-house text-sm"></i> မူလစာမျက်နှာ (Home)
+        </a>
+        <a href="payment.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 text-slate-600 dark:text-gray-300 transition">
+          <i class="fa-solid fa-wallet text-amber-500 text-sm"></i> ငွေဖြည့်သွင်းခြင်း (Top-Up)
+        </a>
+        <a href="order.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 text-slate-600 dark:text-gray-300 transition">
+          <i class="fa-solid fa-receipt text-sm"></i> အော်ဒါများ (Order)
+        </a>
+        <a href="profile.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 text-slate-600 dark:text-gray-300 transition">
+          <i class="fa-solid fa-user-gear text-sm"></i> ပရိုဖိုင် (Profile)
+        </a>
+        <a href="Preorder.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 text-slate-600 dark:text-gray-300 transition">
+          <i class="fa-solid fa-clock-rotate-left text-amber-400 text-sm"></i> ကြိုတင်မှာယူမှု (Pre-Order)
+        </a>
+        <button onclick="openAppGuideModal()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 text-blue-400 font-bold transition text-left">
+          <i class="fa-solid fa-download text-sm"></i> App အဖြစ် ထည့်သွင်းမည်
+        </button>
+      </nav>
+    </div>
+
+    <div class="border-t border-slate-200 dark:border-white/10 pt-3">
+      <div id="sidebarAuthAction"></div>
+      <div id="mstClock" class="mt-2 text-[10px] text-center text-slate-400">မြန်မာစံတော်ချိန်: --:--</div>
+    </div>
+  </aside>
+
+  <!-- HEADER -->
+  <header class="sticky top-0 z-30 bg-white/90 dark:bg-[#090d16]/90 backdrop-blur-md border-b border-slate-200 dark:border-white/10 px-3.5 py-2.5">
+    <div class="max-w-md mx-auto flex items-center justify-between">
+      
+      <div class="flex items-center gap-2">
+        <button onclick="toggleMenu()" aria-label="Menu" class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-700 dark:text-gray-200 active:scale-95 transition">
+          <i class="fa-solid fa-bars text-base"></i>
+        </button>
+
+        <a href="index.html" class="flex items-center gap-2 active:scale-95 transition">
+          <div class="w-8 h-8 rounded-xl overflow-hidden border border-brand-500/40 bg-slate-800 flex items-center justify-center shadow-md shadow-brand-500/25 shrink-0">
+            <img id="headerSiteLogo" src="" class="w-full h-full object-cover hidden" alt="Logo">
+            <div id="headerDefaultLogoIcon" class="w-full h-full bg-gradient-to-tr from-brand-600 via-sky-500 to-indigo-600 text-white flex items-center justify-center">
+              <i class="fa-solid fa-gamepad text-sm animate-pulse"></i>
+            </div>
+          </div>
+          <div class="flex flex-col">
+            <span id="headerSiteName" class="font-black text-sm tracking-widest bg-gradient-to-r from-brand-500 via-sky-400 to-indigo-500 bg-clip-text text-transparent leading-none">
+              KAVXY
+            </span>
+            <span class="text-[8px] text-slate-400 font-mono tracking-tighter" id="headerSeasonTag">EVENT</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button onclick="openAppGuideModal()" class="w-9 h-9 rounded-xl bg-blue-500/10 hover:bg-blue-500 text-blue-400 hover:text-white border border-blue-500/20 flex items-center justify-center active:scale-95 transition" title="App အဖြစ် ထည့်သွင်းမည်">
+          <i class="fa-solid fa-mobile-screen-button text-sm"></i>
+        </button>
+
+        <div class="relative">
+          <button onclick="toggleNotifDropdown()" id="notifBellBtn" class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-700 dark:text-gray-200 active:scale-95 transition relative" title="အသိပေးချက်များ">
+            <i class="fa-solid fa-bell text-sm" id="bellIcon"></i>
+            <span id="notifDot" class="hidden absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-rose-500 ring-2 ring-white dark:ring-[#090d16] animate-pulse"></span>
+          </button>
+
+          <div id="notifDropdown" class="hidden absolute right-0 mt-2 w-72 rounded-2xl bg-white dark:bg-[#0e1629] border border-slate-200 dark:border-white/10 shadow-2xl z-50 overflow-hidden text-xs">
+            <div class="p-3 border-b border-slate-100 dark:border-white/5 flex items-center justify-between">
+              <div class="flex items-center gap-2 font-bold text-slate-900 dark:text-white">
+                <i class="fa-solid fa-bell text-amber-500"></i>
+                <span>အသိပေးချက်များ</span>
+              </div>
+              <button onclick="clearAllNotifications()" class="text-[10px] text-slate-400 hover:text-rose-500 transition">ရှင်းမည်</button>
+            </div>
+            <div id="notifListContainer" class="max-h-60 overflow-y-auto divide-y divide-slate-100 dark:divide-white/5 p-1"></div>
+          </div>
+        </div>
+
+        <button onclick="toggleThemeManual()" aria-label="Toggle Theme" class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-700 dark:text-gray-200 active:scale-95 transition">
+          <i id="themeIcon" class="fa-solid fa-moon text-sm"></i>
+        </button>
+
+        <div id="headerAuthContainer" class="flex items-center gap-2"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="max-w-md mx-auto px-3.5 pt-3 space-y-3.5 relative z-20">
+
+    <!-- SEARCH BOX -->
+    <div class="relative">
+      <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+        <i class="fa-solid fa-magnifying-glass text-xs text-brand-500"></i>
+      </div>
+      <input type="text" id="gameSearchInput" oninput="handleGameSearch(this.value)" placeholder="ဂိမ်းအမည် ရှာဖွေပါ (ဥပမာ: Mobile Legends, PUBG, HOK)..." class="w-full pl-9 pr-8 py-2.5 rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#111827] text-xs font-semibold placeholder:text-slate-400 focus:outline-none focus:border-brand-500 shadow-sm transition">
+      <button id="clearSearchBtn" onclick="clearSearch()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-white text-xs hidden">
+        <i class="fa-solid fa-circle-xmark"></i>
+      </button>
+    </div>
+
+    <!-- ROLE-BASED NOTICE BANNER -->
+    <div id="authNoticeBanner"></div>
+
+    <!-- DYNAMIC FESTIVE NOTICE TICKER (Admin မှ ပေးပို့သော စာတန်းကို Live ပြသမည်) -->
+    <div class="flex items-center gap-2 p-2.5 rounded-2xl bg-white/80 dark:bg-[#111827]/80 border border-slate-200 dark:border-white/10 text-xs backdrop-blur-md shadow-sm">
+      <span class="px-2 py-0.5 rounded-lg bg-amber-500 text-black text-[9px] font-black uppercase shrink-0" id="seasonNoticeTag">EVENT</span>
+      <div class="overflow-hidden whitespace-nowrap w-full">
+        <p class="text-slate-700 dark:text-slate-200 text-[11px] font-semibold animate-pulse truncate" id="seasonNoticeText">
+          🎉 လူတိုင်းအတွက် Game Top-Up ပရိုမိုးရှင်းများနှင့် Event အသစ်များကို ကြည့်ရှုလိုက်ပါ။
+        </p>
+      </div>
+    </div>
+
+    <!-- 16:9 CAROUSEL BANNER (AIMAGE မှ ပုံ ၅ ပုံ တိုက်ရိုက်ချိတ်ဆက်ထားသည်) -->
+    <section class="relative w-full overflow-hidden" id="bannerContainer">
+      <div class="relative w-full h-[180px] xs:h-[210px] flex items-center justify-center overflow-hidden">
+        <button onclick="prevSlide()" class="absolute left-1 z-30 w-7 h-7 rounded-full bg-black/60 border border-white/20 text-white flex items-center justify-center active:scale-90 shadow">
+          <i class="fa-solid fa-chevron-left text-[11px]"></i>
+        </button>
+        <button onclick="nextSlide()" class="absolute right-1 z-30 w-7 h-7 rounded-full bg-black/60 border border-white/20 text-white flex items-center justify-center active:scale-90 shadow">
+          <i class="fa-solid fa-chevron-right text-[11px]"></i>
+        </button>
+
+        <div class="banner-slide absolute w-[78%] aspect-video rounded-2xl overflow-hidden shadow-xl cursor-pointer" onclick="goToSlide(0)">
+          <img id="bannerImg_0" src="https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=800&auto=format&fit=crop" class="w-full h-full object-cover">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent flex items-end p-2.5 text-white pointer-events-none">
+            <div>
+              <span id="bannerTag_0" class="bg-blue-600 text-white text-[8px] font-black uppercase px-1.5 py-0.5 rounded">Moonton</span>
+              <h3 id="bannerTitle_0" class="font-extrabold text-xs drop-shadow mt-0.5 truncate">Mobile Legends: Bang Bang</h3>
+            </div>
+          </div>
+        </div>
+
+        <div class="banner-slide absolute w-[78%] aspect-video rounded-2xl overflow-hidden shadow-xl cursor-pointer" onclick="goToSlide(1)">
+          <img id="bannerImg_1" src="https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=800&auto=format&fit=crop" class="w-full h-full object-cover">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent flex items-end p-2.5 text-white pointer-events-none">
+            <div>
+              <span id="bannerTag_1" class="bg-amber-500 text-black text-[8px] font-black uppercase px-1.5 py-0.5 rounded">Tencent</span>
+              <h3 id="bannerTitle_1" class="font-extrabold text-xs drop-shadow mt-0.5 truncate">PUBG Mobile (Battle Royale)</h3>
+            </div>
+          </div>
+        </div>
+
+        <div class="banner-slide absolute w-[78%] aspect-video rounded-2xl overflow-hidden shadow-xl cursor-pointer" onclick="goToSlide(2)">
+          <img id="bannerImg_2" src="https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=800&auto=format&fit=crop" class="w-full h-full object-cover">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent flex items-end p-2.5 text-white pointer-events-none">
+            <div>
+              <span id="bannerTag_2" class="bg-red-600 text-white text-[8px] font-black uppercase px-1.5 py-0.5 rounded">Level Infinite</span>
+              <h3 id="bannerTitle_2" class="font-extrabold text-xs drop-shadow mt-0.5 truncate">Honor of Kings (HOK)</h3>
+            </div>
+          </div>
+        </div>
+
+        <div class="banner-slide absolute w-[78%] aspect-video rounded-2xl overflow-hidden shadow-xl cursor-pointer" onclick="goToSlide(3)">
+          <img id="bannerImg_3" src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=800&auto=format&fit=crop" class="w-full h-full object-cover">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent flex items-end p-2.5 text-white pointer-events-none">
+            <div>
+              <span id="bannerTag_3" class="bg-purple-600 text-white text-[8px] font-black uppercase px-1.5 py-0.5 rounded">NetEase</span>
+              <h3 id="bannerTitle_3" class="font-extrabold text-xs drop-shadow mt-0.5 truncate">Blood Strike (Fast FPS)</h3>
+            </div>
+          </div>
+        </div>
+
+        <div class="banner-slide absolute w-[78%] aspect-video rounded-2xl overflow-hidden shadow-xl cursor-pointer" onclick="goToSlide(4)">
+          <img id="bannerImg_4" src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=800&auto=format&fit=crop" class="w-full h-full object-cover">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent flex items-end p-2.5 text-white pointer-events-none">
+            <div>
+              <span id="bannerTag_4" class="bg-orange-500 text-white text-[8px] font-black uppercase px-1.5 py-0.5 rounded">Garena</span>
+              <h3 id="bannerTitle_4" class="font-extrabold text-xs drop-shadow mt-0.5 truncate">Free Fire: Booyah</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="carouselDots" class="flex justify-center items-center gap-1.5 mt-1.5">
+        <button onclick="goToSlide(0)" class="w-2 h-2 rounded-full transition-all duration-300"></button>
+        <button onclick="goToSlide(1)" class="w-2 h-2 rounded-full transition-all duration-300"></button>
+        <button onclick="goToSlide(2)" class="w-2 h-2 rounded-full transition-all duration-300"></button>
+        <button onclick="goToSlide(3)" class="w-2 h-2 rounded-full transition-all duration-300"></button>
+        <button onclick="goToSlide(4)" class="w-2 h-2 rounded-full transition-all duration-300"></button>
+      </div>
+    </section>
+
+    <!-- GAME BOX GRID -->
+    <section>
+      <div class="flex items-center justify-between mb-2.5 px-0.5">
+        <h3 class="text-xs font-bold flex items-center gap-1.5 text-slate-900 dark:text-white">
+          <i class="fa-solid fa-gamepad text-brand-500"></i> နာမည်ကြီး မိုဘိုင်းဂိမ်းများ
+        </h3>
+        <span class="text-[10px] text-brand-500 font-semibold" id="gameCountIndicator">ဂိမ်းဝန်ဆောင်မှုများ</span>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2.5" id="gameGridContainer"></div>
+      
+      <div id="searchEmptyState" class="hidden py-10 text-center bg-white dark:bg-[#111827] border border-slate-200 dark:border-white/5 rounded-2xl">
+        <i class="fa-solid fa-magnifying-glass text-2xl text-slate-400 mb-2 block"></i>
+        <span class="text-xs font-bold text-slate-400">ရှာဖွေထားသော ဂိမ်းမရှိသေးပါ</span>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- BOTTOM BAR -->
+  <nav class="fixed bottom-3 left-3 right-3 z-40 max-w-md mx-auto bg-white/95 dark:bg-[#111827]/95 backdrop-blur-lg border border-slate-200 dark:border-white/15 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.22)] px-3 py-3" aria-label="Bottom navigation">
+    <div class="max-w-md mx-auto flex items-center justify-between gap-1 text-center">
+      <a href="index.html" class="flex flex-col items-center gap-0.5 text-brand-500"><i class="fa-solid fa-house text-lg"></i><span class="text-[10px] font-bold">Home</span></a>
+      <a href="payment.html" class="flex flex-col items-center gap-0.5 text-slate-400 dark:text-gray-400 hover:text-brand-500 transition"><i class="fa-solid fa-wallet text-lg"></i><span class="text-[10px] font-semibold">Top-Up</span></a>
+      <a href="order.html" class="flex flex-col items-center gap-0.5 text-slate-400 dark:text-gray-400 hover:text-brand-500 transition"><i class="fa-solid fa-receipt text-lg"></i><span class="text-[10px] font-semibold">Order</span></a>
+      <a href="spin.html" class="flex flex-col items-center gap-0.5 text-amber-500 hover:text-amber-400 transition" aria-label="ကံစမ်းမဲလှည့်ရန်"><i class="fa-solid fa-dharmachakra text-lg"></i><span class="text-[10px] font-semibold">Spin</span></a>
+      <a href="profile.html" class="flex flex-col items-center gap-0.5 text-slate-400 dark:text-gray-400 hover:text-brand-500 transition"><i class="fa-solid fa-user text-lg"></i><span class="text-[10px] font-semibold">Profile</span></a>
+    </div>
+  </nav>
+
+  <!-- ==================== JAVASCRIPT: ADMIN REALTIME CLOUD SYNC ENGINE ==================== -->
+  <script>
+    const NOTIF_STORAGE_KEY = 'site_admin_broadcast_notifs';
+    const FIREBASE_DB_URL = "https://kavxy-5d60f-default-rtdb.firebaseio.com/";
+    const CURRENT_APP_VERSION = "1.0.0";
+
+    // ------------------------------------------------------------
+    // ROCKET OFFLINE STATUS: detect real cloud failures, not only navigator.onLine
+    // ------------------------------------------------------------
+    let rocketSyncInFlight = false;
+    function showRocketOffline(message) {
+      const overlay = document.getElementById('rocketOfflineOverlay');
+      if (!overlay) return;
+      document.getElementById('rocketOfflineMessage').textContent = message || 'အင်တာနက်ချိတ်ဆက်မှုကို စောင့်ဆိုင်းနေပါသည်…';
+      overlay.classList.add('is-visible');
+      overlay.setAttribute('aria-hidden', 'false');
+    }
+    function hideRocketOffline() {
+      const overlay = document.getElementById('rocketOfflineOverlay');
+      if (!overlay) return;
+      overlay.classList.remove('is-visible');
+      overlay.setAttribute('aria-hidden', 'true');
+    }
+    function retryRocketConnection() {
+      if (navigator.onLine) hideRocketOffline();
+      syncFromCloudDatabase();
+    }
+    window.addEventListener('offline', () => showRocketOffline('အင်တာနက်လိုင်း ပြတ်တောက်နေပါသည်။ ပြန်ချိတ်ဆက်ရန် စောင့်ဆိုင်းနေပါသည်…'));
+    window.addEventListener('online', () => {
+      hideRocketOffline(); // Internet restored: dismiss immediately, even if cloud sync is slow
+      syncFromCloudDatabase();
+    });
+    if (!navigator.onLine) showRocketOffline();
+
+    // ------------------------------------------------------------
+    // ADMIN CLOUD AUTO-SYNC (ALL USERS REALTIME)
+    // ------------------------------------------------------------
+    async function syncFromCloudDatabase() {
+      if (rocketSyncInFlight) return;
+      rocketSyncInFlight = true;
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
+      try {
+        const res = await fetch(`${FIREBASE_DB_URL}.json`, {signal:controller.signal, cache:'no-store'});
+        if (!res.ok) throw new Error('Cloud HTTP ' + res.status);
+        const data = await res.json();
+        hideRocketOffline();
+        if (!data) {
+          applyMaintenanceCloudState(false, '', '');
+          return;
+        }
+
+        // ၁။ Pre-Maintenance Live Sync
+        applyMaintenanceCloudState(
+          data.site_maintenance === true || data.site_maintenance === 'true',
+          data.site_maintenance_msg || '',
+          data.maint_est_time || ''
+        );
+
+        // ၂။ Notifications Live Sync
+        if (data.broadcast_notifs) {
+          localStorage.setItem(NOTIF_STORAGE_KEY, JSON.stringify(data.broadcast_notifs));
+          loadNotifications();
+        }
+
+        // ၃။ AIMAGE.HTML မှ BANNER ပုံ ၅ ပုံ တိုက်ရိုက်ဆွဲယူချိတ်ဆက်ခြင်း
+        if (data.admin_carousel_banners && Array.isArray(data.admin_carousel_banners)) {
+          data.admin_carousel_banners.forEach((b, i) => {
+            if (i < 5) {
+              const imgEl = document.getElementById(`bannerImg_${i}`);
+              const titleEl = document.getElementById(`bannerTitle_${i}`);
+              const tagEl = document.getElementById(`bannerTag_${i}`);
+
+              if (imgEl && b.image) imgEl.src = b.image;
+              if (titleEl && b.title) titleEl.innerText = b.title;
+              if (tagEl && b.tag) tagEl.innerText = b.tag;
+            }
+          });
+        }
+
+        // ၄။ ရာသီဥတု AEvent Theme Live Sync
+        if (data.active_season) {
+          localStorage.setItem('site_event_theme_config', JSON.stringify({ activeMode: data.active_season }));
+          loadActiveSeasonFromAdmin();
+        }
+
+        // ၅။ နာမည်နှင့် Logo Sync (Asetting / Admin မှ)
+        if (data.site_platform_config) {
+          localStorage.setItem('site_platform_config', JSON.stringify(data.site_platform_config));
+          syncLogoAndBrandFromAdmin();
+        }
+
+        // ၆။ Live Notice Ticker Text Sync
+        if (data.live_notice_text) {
+          document.getElementById('seasonNoticeText').innerText = data.live_notice_text;
+        }
+
+        // ၇။ Version Update Alert Live Sync
+        if (data.app_version_config) {
+          const vCfg = data.app_version_config;
+          if (vCfg.latestVersion && vCfg.latestVersion !== CURRENT_APP_VERSION) {
+            if (vCfg.updateMessage) {
+              document.getElementById('updateNoticeText').innerText = vCfg.updateMessage;
+            }
+            document.getElementById('updateAlertModal').classList.remove('hidden');
+          }
+        }
+
+      } catch (err) {
+        // A Firebase permission/server error is not an internet outage.
+        // Never leave the rocket blocking the page after connectivity returns.
+        if (!navigator.onLine) {
+          showRocketOffline('အင်တာနက်လိုင်း ပြတ်တောက်နေပါသည်။ ပြန်ချိတ်ဆက်ရန် စောင့်ဆိုင်းနေပါသည်…');
+        } else {
+          hideRocketOffline();
+          console.warn('KAVXY cloud sync unavailable:', err);
+        }
+      } finally {
+        clearTimeout(timeoutId);
+        rocketSyncInFlight = false;
+      }
+    }
+
+    // Maintenance status is checked independently so it remains responsive even
+    // if large banner/order data makes the general cloud sync slow.
+    let maintenanceRequestInFlight = false;
+    function applyMaintenanceCloudState(enabled, notice, estimatedTime) {
+      localStorage.setItem('site_maintenance', enabled ? 'true' : 'false');
+      localStorage.setItem('site_maintenance_msg', String(notice || ''));
+      localStorage.setItem('maint_est_time', String(estimatedTime || ''));
+      checkMaintenanceLive();
+    }
+    async function pollMaintenanceStatus() {
+      if (maintenanceRequestInFlight || !navigator.onLine) return;
+      maintenanceRequestInFlight = true;
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 7000);
+      try {
+        const response = await fetch(`${FIREBASE_DB_URL}site_maintenance.json`, {
+          signal: controller.signal, cache: 'no-store'
+        });
+        if (!response.ok) throw new Error('Maintenance status HTTP ' + response.status);
+        const enabled = await response.json();
+        const on = enabled === true || enabled === 'true';
+        // Always apply OFF as well; do not leave stale maintenance overlays visible.
+        localStorage.setItem('site_maintenance', on ? 'true' : 'false');
+        checkMaintenanceLive();
+        if (on) {
+          const [noticeResult, timeResult] = await Promise.allSettled([
+            fetch(`${FIREBASE_DB_URL}site_maintenance_msg.json`, {cache:'no-store'}),
+            fetch(`${FIREBASE_DB_URL}maint_est_time.json`, {cache:'no-store'})
+          ]);
+          if (noticeResult.status === 'fulfilled' && noticeResult.value.ok) {
+            localStorage.setItem('site_maintenance_msg', (await noticeResult.value.json()) || '');
+          }
+          if (timeResult.status === 'fulfilled' && timeResult.value.ok) {
+            localStorage.setItem('maint_est_time', (await timeResult.value.json()) || '');
+          }
+          checkMaintenanceLive();
+        }
+      } catch (error) {
+        // Keep the last confirmed status on temporary connection failures.
+        console.warn('Maintenance sync failed:', error);
+      } finally {
+        clearTimeout(timer);
+        maintenanceRequestInFlight = false;
+      }
+    }
+    setInterval(pollMaintenanceStatus, 3000);
+    window.addEventListener('online', pollMaintenanceStatus);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) pollMaintenanceStatus();
+    });
+
+    // စက္ကန့်ပိုင်းအတွင်း အလိုအလျောက် Cloud နှင့် တပြေးညီ ချိတ်ဆက်ထားခြင်း
+    setInterval(syncFromCloudDatabase, 6000);
+    syncFromCloudDatabase();
+
+    // UPDATE PROGRESS BAR ANIMATION
+    function startUpdateDownload() {
+      const btn = document.getElementById('btnStartUpdate');
+      const dlBox = document.getElementById('downloadSection');
+      const bar = document.getElementById('downloadProgressBar');
+      const percentText = document.getElementById('downloadPercent');
+
+      btn.classList.add('hidden');
+      dlBox.classList.remove('hidden');
+
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += Math.floor(Math.random() * 8) + 5;
+        if (progress >= 100) {
+          progress = 100;
+          clearInterval(interval);
+          bar.style.width = '100%';
+          percentText.innerText = '100%';
+
+          setTimeout(() => {
+            alert("နောက်ဆုံးဗားရှင်းသို့ အောင်မြင်စွာ Update ပြုလုပ်ပြီးပါပြီ!");
+            window.location.reload(true);
+          }, 450);
+        } else {
+          bar.style.width = progress + '%';
+          percentText.innerText = progress + '%';
+        }
+      }, 100);
+    }
+
+    function dismissUpdate() {
+      document.getElementById('updateAlertModal').classList.add('hidden');
+    }
+
+    function openAppGuideModal() {
+      document.getElementById('appInstallGuideModal').classList.remove('hidden');
+    }
+
+    function closeAppGuideModal() {
+      document.getElementById('appInstallGuideModal').classList.add('hidden');
+    }
+
+    function checkAndShowWelcomeAlert() {
+      document.getElementById('welcomeAlertModal').classList.remove('hidden');
+    }
+
+    function closeWelcomeAlert() {
+      document.getElementById('welcomeAlertModal').classList.add('hidden');
+    }
+
+    function handleEventScroll() {
+      const container = document.getElementById('eventScrollContainer');
+      const scrollLeft = container.scrollLeft;
+      const cardWidth = container.offsetWidth * 0.86;
+      const activeIndex = Math.round(scrollLeft / cardWidth);
+
+      [0, 1, 2].forEach(i => {
+        const dot = document.getElementById(`eventDot${i}`);
+        if (i === activeIndex) {
+          dot.className = "w-4 h-1.5 rounded-full bg-amber-500 transition-all duration-300";
+        } else {
+          dot.className = "w-1.5 h-1.5 rounded-full bg-white/20 transition-all duration-300";
+        }
+      });
+    }
+
+    function syncLogoAndBrandFromAdmin() {
+      let siteName = 'KAVXY';
+      let siteLogoUrl = null;
+
+      try {
+        const rawPlatform = localStorage.getItem('site_platform_config');
+        if (rawPlatform) {
+          const cfg = JSON.parse(rawPlatform);
+          if (cfg.name && cfg.name.trim() !== '') siteName = cfg.name.trim();
+          if (cfg.logo && cfg.logo.trim() !== '') siteLogoUrl = cfg.logo.trim();
+        }
+      } catch (e) {}
+
+      document.getElementById('pageTitle').innerText = `${siteName} - Mobile Game Hub`;
+      document.getElementById('headerSiteName').innerText = siteName;
+      document.getElementById('sidebarSiteName').innerText = siteName;
+
+      const headerLogoImg = document.getElementById('headerSiteLogo');
+      const headerDefaultIcon = document.getElementById('headerDefaultLogoIcon');
+      if (siteLogoUrl) {
+        headerLogoImg.src = siteLogoUrl;
+        headerLogoImg.classList.remove('hidden');
+        headerDefaultIcon.classList.add('hidden');
+      } else {
+        headerLogoImg.classList.add('hidden');
+        headerDefaultIcon.classList.remove('hidden');
+      }
+
+      const sidebarLogoImg = document.getElementById('sidebarSiteLogo');
+      const sidebarDefaultIcon = document.getElementById('sidebarDefaultLogoIcon');
+      if (siteLogoUrl) {
+        sidebarLogoImg.src = siteLogoUrl;
+        sidebarLogoImg.classList.remove('hidden');
+        sidebarDefaultIcon.classList.add('hidden');
+      } else {
+        sidebarLogoImg.classList.add('hidden');
+        sidebarDefaultIcon.classList.remove('hidden');
+      }
+    }
+
+    const SEASONS_DATA = {
+      general: { themeClass: 'theme-general', tag: 'EVENT', corner: '🎉', notice: '🎉 လူတိုင်းအတွက် Game Top-Up ပရိုမိုးရှင်းများနှင့် Event အသစ်များကို ကြည့်ရှုလိုက်ပါ။' },
+      summer: { themeClass: 'theme-summer', tag: 'SUMMER', corner: '🌴', notice: '🌴 နွေရာသီ အပူဒဏ်ပြေပျောက်စေမည့် အထူးစိန်ပရိုမိုးရှင်းများ ရယူလိုက်ပါ။' },
+      rainy: { themeClass: 'theme-rainy', tag: 'MONSOON', corner: '🍃', notice: '🌧️ မိုးရာသီ အထူးလျော့စျေး စိန်စျေးနှုန်းများဖြင့် ၂၄ နာရီ ဝယ်ယူနိုင်ပါပြီ။' },
+      winter: { themeClass: 'theme-winter', tag: 'WINTER', corner: '❄️', notice: '❄️ ဆောင်းရာသီ အေးမြသောလေညင်းနှင့်အတူ အမြန်ဆုံး Game Top-Up ဝန်ဆောင်မှု ရယူလိုက်ပါ။' },
+      thingyan: { themeClass: 'theme-thingyan', tag: 'THINGYAN', corner: '🌼', notice: '🌼 ရွှေဝါရောင်ပိတောက်ပန်းများနှင့် အေးမြကြည်လင်သော သင်္ကြန်ကာလ အထူးစိန်ပရိုမိုးရှင်းများ ရယူလိုက်ပါ။' },
+      thadingyut: { themeClass: 'theme-thadingyut', tag: 'THADINGYUT', corner: '🏮', notice: '🏮 မင်္ဂလာရှိသော သီတင်းကျွတ် ဆီမီးပွဲတော် အထူးလျှော့စျေးများဖြင့် စိန်ဖြည့်သွင်းလိုက်ပါ။' }
+    };
+
+    let activeSeasonKey = 'general';
+
+    function loadActiveSeasonFromAdmin() {
+      try {
+        const raw = localStorage.getItem('site_event_theme_config');
+        if (raw) {
+          const cfg = JSON.parse(raw);
+          if (cfg && cfg.activeMode && SEASONS_DATA[cfg.activeMode]) {
+            activeSeasonKey = cfg.activeMode;
+          }
+        }
+      } catch(e) {}
+      applySeasonTheme(activeSeasonKey);
+    }
+
+    function applySeasonTheme(seasonKey) {
+      const data = SEASONS_DATA[seasonKey];
+      document.body.className = `${data.themeClass} text-slate-800 dark:text-gray-100 min-h-screen transition-colors duration-300 pb-24 overflow-x-hidden select-none`;
+      document.getElementById('headerSeasonTag').innerText = data.tag;
+      document.getElementById('seasonNoticeTag').innerText = data.tag;
+      document.getElementById('seasonNoticeText').innerText = data.notice;
+      initSeasonalCanvas(seasonKey);
+      renderGames(getAllGames());
+    }
+
+    const canvas = document.getElementById('seasonalCanvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let animId = null;
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+
+    function initSeasonalCanvas(type) {
+      resizeCanvas();
+      particles = [];
+      const count = type === 'general' ? 14 : (type === 'rainy' ? 45 : (type === 'winter' ? 40 : 25));
+
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          size: Math.random() * 4 + 2,
+          speedY: type === 'rainy' ? (Math.random() * 6 + 10) : (type === 'thadingyut' ? -(Math.random() * 0.7 + 0.3) : (Math.random() * 1.3 + 0.6)),
+          speedX: type === 'rainy' ? -1.2 : (Math.sin(Math.random() * Math.PI * 2) * 0.5),
+          rotation: Math.random() * Math.PI * 2,
+          rotationSpeed: (Math.random() - 0.5) * 0.04,
+          opacity: Math.random() * 0.7 + 0.3,
+          length: Math.random() * 14 + 8,
+          type: type
+        });
+      }
+
+      if (animId) cancelAnimationFrame(animId);
+      renderParticles();
+    }
+
+    function renderParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      particles.forEach(p => {
+        ctx.save();
+        if (p.type === 'rainy') {
+          ctx.strokeStyle = '#38bdf8';
+          ctx.lineWidth = 1.3;
+          ctx.lineCap = 'round';
+          ctx.beginPath();
+          ctx.globalAlpha = p.opacity;
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(p.x - 2, p.y + p.length);
+          ctx.stroke();
+        } else {
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rotation);
+          ctx.beginPath();
+
+          if (p.type === 'general') {
+            ctx.arc(0, 0, p.size * 0.65, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(56, 189, 248, ${p.opacity * 0.65})`;
+            ctx.fill();
+          } else if (p.type === 'thingyan') {
+            ctx.ellipse(0, 0, p.size * 1.6, p.size * 0.9, 0, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(250, 204, 21, ${p.opacity})`;
+            ctx.shadowBlur = 6;
+            ctx.shadowColor = "#eab308";
+            ctx.fill();
+          } else if (p.type === 'winter') {
+            ctx.arc(0, 0, p.size * 0.8, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(224, 242, 254, ${p.opacity})`;
+            ctx.shadowBlur = 5;
+            ctx.shadowColor = "#bae6fd";
+            ctx.fill();
+          } else if (p.type === 'thadingyut') {
+            ctx.rect(-p.size, -p.size * 1.3, p.size * 2, p.size * 2.6);
+            ctx.fillStyle = `rgba(251, 191, 36, ${p.opacity})`;
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = "#f59e0b";
+            ctx.fill();
+          } else if (p.type === 'summer') {
+            ctx.arc(0, 0, p.size * 0.7, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(245, 158, 11, ${p.opacity})`;
+            ctx.shadowBlur = 6;
+            ctx.shadowColor = "#f59e0b";
+            ctx.fill();
+          }
+        }
+        ctx.restore();
+
+        p.y += p.speedY;
+        p.x += p.speedX;
+        p.rotation += p.rotationSpeed;
+
+        if (p.type === 'thadingyut' && p.y < -20) p.y = canvas.height + 20;
+        if (p.type !== 'thadingyut' && p.y > canvas.height + 20) p.y = -20;
+        if (p.x > canvas.width) p.x = 0;
+        if (p.x < 0) p.x = canvas.width;
+      });
+
+      animId = requestAnimationFrame(renderParticles);
+    }
+
+    function loadNotifications() {
+      const container = document.getElementById('notifListContainer');
+      const dot = document.getElementById('notifDot');
+      const bell = document.getElementById('bellIcon');
+
+      let notifs = [];
+      try {
+        const raw = localStorage.getItem(NOTIF_STORAGE_KEY);
+        if (raw) notifs = JSON.parse(raw);
+      } catch(e) {}
+
+      container.innerHTML = '';
+
+      if (notifs.length === 0) {
+        dot.classList.add('hidden');
+        bell.className = "fa-solid fa-bell text-sm";
+        container.innerHTML = `<div class="p-4 text-center text-slate-400 text-xs">အသိပေးချက် မရှိသေးပါ</div>`;
+        return;
+      }
+
+      const hasUnread = notifs.some(n => !n.read);
+      if (hasUnread) {
+        dot.classList.remove('hidden');
+        bell.className = "fa-solid fa-bell text-sm text-amber-500 animate-wiggle";
+      } else {
+        dot.classList.add('hidden');
+        bell.className = "fa-solid fa-bell text-sm";
+      }
+
+      notifs.forEach(n => {
+        const item = document.createElement('div');
+        item.className = `p-2.5 rounded-xl transition ${n.read ? 'opacity-70' : 'bg-slate-50 dark:bg-white/[0.04] font-semibold'}`;
+        item.innerHTML = `
+          <div class="flex items-center justify-between text-[9px] text-slate-400 mb-0.5">
+            <span class="text-amber-500 font-bold">${n.tag || 'EVENT'}</span>
+            <span>${n.time}</span>
+          </div>
+          <h5 class="text-xs font-bold text-slate-900 dark:text-white">${n.title}</h5>
+          <p class="text-[10px] text-slate-500 dark:text-slate-300 mt-0.5 leading-snug">${n.message}</p>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function toggleNotifDropdown() {
+      const dd = document.getElementById('notifDropdown');
+      dd.classList.toggle('hidden');
+
+      let notifs = JSON.parse(localStorage.getItem(NOTIF_STORAGE_KEY)) || [];
+      notifs.forEach(n => n.read = true);
+      localStorage.setItem(NOTIF_STORAGE_KEY, JSON.stringify(notifs));
+
+      document.getElementById('notifDot').classList.add('hidden');
+      document.getElementById('bellIcon').className = "fa-solid fa-bell text-sm";
+    }
+
+    function clearAllNotifications() {
+      localStorage.removeItem(NOTIF_STORAGE_KEY);
+      loadNotifications();
+      document.getElementById('notifDropdown').classList.add('hidden');
+    }
+
+    function checkMaintenanceLive() {
+      const isMaint = localStorage.getItem('site_maintenance') === 'true';
+      // A public client-side passcode must not bypass maintenance for visitors.
+      const isBypassed = false;
+      const overlay = document.getElementById('maintenanceOverlay');
+
+      const customMsg = localStorage.getItem('site_maintenance_msg');
+      const estTime = localStorage.getItem('maint_est_time');
+
+      document.getElementById('maintDisplayNotice').innerText = customMsg || 'ဆာဗာအား ခေတ္တ ပြင်ဆင်ထိန်းသိမ်းနေပါသည်။ မကြာမီ ပြန်လည်ဖွင့်လှစ်ပေးပါမည်။';
+      const estBox = document.getElementById('maintEstTimeTag');
+      if (estTime) {
+        estBox.classList.remove('hidden');
+        document.getElementById('maintEstTimeVal').innerText = estTime;
+      } else {
+        estBox.classList.add('hidden');
+      }
+
+      if (isMaint && !isBypassed) {
+        overlay.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+      } else {
+        overlay.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+      }
+    }
+
+    function unlockAdminBypass() {
+      // Secure admin bypass requires verified Firebase Auth admin claims.
+      // Do not trust a hardcoded passcode in publicly downloadable HTML.
+      alert('Maintenance ကို Admin Dashboard မှ ပိတ်ပေးပါ။');
+    }
+
+    function getUserBadgeClass(totalSpent) {
+      const defaultTiers = [
+        { id: 1,  min: 1000,   cssClass: 'owl-lvl-1' },
+        { id: 2,  min: 5000,   cssClass: 'owl-lvl-2' },
+        { id: 3,  min: 15000,  cssClass: 'owl-lvl-3' },
+        { id: 4,  min: 30000,  cssClass: 'owl-lvl-4' },
+        { id: 5,  min: 50000,  cssClass: 'owl-lvl-5' },
+        { id: 6,  min: 75000,  cssClass: 'owl-lvl-6' },
+        { id: 7,  min: 100000, cssClass: 'owl-lvl-7' },
+        { id: 8,  min: 150000, cssClass: 'owl-lvl-8' },
+        { id: 9,  min: 200000, cssClass: 'owl-lvl-9' },
+        { id: 10, min: 300000, cssClass: 'owl-lvl-10' },
+        { id: 11, min: 500000, cssClass: 'owl-lvl-11' }
+      ];
+      const tiers = JSON.parse(localStorage.getItem('admin_owl_sprite_tiers')) || defaultTiers;
+      const sorted = [...tiers].sort((a, b) => (b.min || 0) - (a.min || 0));
+      const matched = sorted.find(t => totalSpent >= (t.min || 0));
+      return matched ? matched.cssClass : 'owl-lvl-1';
+    }
+
+    function getUserSession() {
+      try {
+        const raw = localStorage.getItem('user_session');
+        return raw ? JSON.parse(raw) : null;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function getUserRealData(session) {
+      if (!session) return { balance: 0, role: 'user', spent: 0 };
+      try {
+        const rawUsers = localStorage.getItem('registered_users_db');
+        const users = rawUsers ? JSON.parse(rawUsers) : [];
+        const matched = users.find(u => 
+          (session.phone && u.phone === session.phone) || 
+          (session.email && u.email === session.email) || 
+          (session.username && u.username === session.username)
+        );
+        if (matched) {
+          return {
+            balance: Number(matched.balance || 0),
+            role: matched.role || 'user',
+            spent: Number(matched.totalSpent || matched.spent || 30000)
+          };
+        }
+      } catch (e) {}
+      return { balance: Number(session.balance || 0), role: session.role || 'user', spent: 30000 };
+    }
+
+    function updateAuthUI() {
+      const session = getUserSession();
+      const headerAuth = document.getElementById('headerAuthContainer');
+      const authBanner = document.getElementById('authNoticeBanner');
+      const sidebarUser = document.getElementById('sidebarUserBox');
+      const sidebarAction = document.getElementById('sidebarAuthAction');
+
+      if (session && session.loggedIn) {
+        const userData = getUserRealData(session);
+        const formattedBalance = userData.balance.toLocaleString();
+        const isReseller = userData.role === 'reseller';
+        const savedAvatar = localStorage.getItem('last_avatar_img') || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=120&auto=format&fit=crop&q=80';
+        const owlClass = getUserBadgeClass(userData.spent);
+        const userEmoji = localStorage.getItem('user_active_emoji') || '💎';
+
+        headerAuth.innerHTML = `
+          <a href="payment.html" class="flex items-center gap-1.5 ${isReseller ? 'bg-gradient-to-r from-reseller-500/15 to-amber-500/20 border-reseller-500 text-reseller-500' : 'bg-gradient-to-r from-brand-500/15 to-accent-500/15 border-brand-500/80 text-brand-500'} border px-2.5 py-1 rounded-full font-bold text-xs shadow-sm active:scale-95 transition">
+            <span class="w-3.5 h-3.5 rounded-full ${isReseller ? 'bg-reseller-500 text-black' : 'bg-brand-500 text-white'} flex items-center justify-center text-[9px]">
+              <i class="fa-solid ${isReseller ? 'fa-crown text-[8px]' : 'fa-plus'}"></i>
+            </span>
+            <span class="text-[11px] font-mono font-extrabold">${formattedBalance} MMK</span>
+          </a>
+          <a href="profile.html" class="w-8 h-8 rounded-full border-2 ${isReseller ? 'border-reseller-500' : 'border-brand-500'} overflow-hidden shadow-sm inline-block">
+            <img src="${savedAvatar}" alt="Profile" class="w-full h-full object-cover">
+          </a>
+        `;
+
+        if (isReseller) {
+          authBanner.innerHTML = `
+            <div class="p-3.5 rounded-3xl bg-gradient-to-r from-reseller-500/20 via-amber-500/10 to-transparent border border-reseller-500/40 flex items-center justify-between shadow-sm">
+              <div class="flex items-center gap-2.5">
+                <span class="w-10 h-10 rounded-2xl bg-reseller-500/20 text-reseller-500 flex items-center justify-center text-lg shrink-0">
+                  <i class="fa-solid fa-crown"></i>
+                </span>
+                <div class="overflow-hidden">
+                  <div class="flex items-center gap-1.5">
+                    <h4 class="text-xs font-black text-slate-900 dark:text-white truncate">မင်္ဂလာပါ, ${session.username || 'Kaung'}!</h4>
+                    <span class="owl-sprite ${owlClass}"></span>
+                    <span class="text-xs">${userEmoji}</span>
+                    <span class="bg-reseller-500 text-black text-[8px] font-black uppercase px-1.5 py-0.5 rounded shadow">VIP</span>
+                  </div>
+                  <div class="text-[11px] text-reseller-500 font-extrabold mt-0.5 font-mono">
+                    လက်ကျန်ငွေ: ${formattedBalance} MMK
+                  </div>
+                </div>
+              </div>
+              <a href="payment.html" class="px-3 py-1.5 rounded-xl bg-reseller-500 hover:bg-reseller-600 text-black text-[10px] font-black shadow transition shrink-0">
+                + ငွေဖြည့်
+              </a>
+            </div>
+          `;
+        } else {
+          authBanner.innerHTML = `
+            <div class="p-3.5 rounded-3xl bg-gradient-to-r from-brand-500/15 via-sky-500/10 to-transparent border border-brand-500/20 flex items-center justify-between shadow-sm">
+              <div class="flex items-center gap-2.5">
+                <span class="w-10 h-10 rounded-2xl bg-brand-500/20 text-brand-500 flex items-center justify-center text-sm font-black shrink-0">
+                  <i class="fa-solid fa-gamepad"></i>
+                </span>
+                <div class="overflow-hidden">
+                  <div class="flex items-center gap-1.5">
+                    <h4 class="text-xs font-bold text-slate-900 dark:text-white truncate">မင်္ဂလာပါ, ${session.username || 'Kaung'}!</h4>
+                    <span class="owl-sprite ${owlClass}"></span>
+                    <span class="text-xs">${userEmoji}</span>
+                    <span class="bg-brand-500/20 text-brand-500 text-[8px] font-bold px-1.5 py-0.5 rounded">USER</span>
+                  </div>
+                  <div class="text-[11px] text-emerald-500 font-extrabold mt-0.5 font-mono">
+                    လက်ကျန်ငွေ: ${formattedBalance} MMK
+                  </div>
+                </div>
+              </div>
+              <a href="payment.html" class="px-3 py-1.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-[10px] font-bold shadow transition shrink-0">
+                + ငွေဖြည့်မည်
+              </a>
+            </div>
+          `;
+        }
+
+        sidebarUser.classList.remove('hidden');
+        document.getElementById('sidebarUserName').innerText = session.username || 'Player';
+        document.getElementById('sidebarUserBalance').innerText = `${formattedBalance} MMK`;
+        document.getElementById('sidebarAvatarImg').src = savedAvatar;
+        document.getElementById('sidebarOwlBadge').className = `owl-sprite ${owlClass}`;
+        document.getElementById('sidebarEmojiBadge').innerText = userEmoji;
+
+        sidebarAction.innerHTML = `
+          <button onclick="handleLogout()" class="w-full py-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500 text-rose-500 hover:text-white border border-rose-500/20 text-xs font-bold transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-right-from-bracket"></i> အကောင့်ထွက်မည် (Logout)
+          </button>
+        `;
+      } else {
+        headerAuth.innerHTML = `
+          <a href="auth.html" class="flex items-center gap-1.5 bg-brand-500 hover:bg-brand-600 text-white px-3 py-1.5 rounded-xl font-bold text-xs shadow-md active:scale-95 transition">
+            <i class="fa-solid fa-user-plus text-[10px]"></i>
+            <span class="text-[11px]">Login</span>
+          </a>
+        `;
+        authBanner.innerHTML = '';
+        sidebarUser.classList.add('hidden');
+        sidebarAction.innerHTML = `
+          <a href="auth.html" class="w-full py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold shadow transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-right-to-bracket"></i> Login / Register
+          </a>
+        `;
+      }
+    }
+
+    function handleLogout() {
+      localStorage.removeItem('user_session');
+      updateAuthUI();
+      toggleMenu();
+    }
+
+    function toggleMenu() {
+      document.getElementById('sidebar').classList.toggle('-translate-x-full');
+      document.getElementById('sidebarOverlay').classList.toggle('hidden');
+    }
+
+    function toggleThemeManual() {
+      document.documentElement.classList.toggle('dark');
+    }
+
+    const DEFAULT_GAMES = [
+      { id: 0, title: "Mobile Legends", tag: "MOBA", currency: "Diamonds", image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400&auto=format&fit=crop" },
+      { id: 1, title: "PUBG Mobile", tag: "BR", currency: "UC", image: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=400&auto=format&fit=crop" },
+      { id: 2, title: "Honor of Kings", tag: "MOBA", currency: "Tokens", image: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=400&auto=format&fit=crop" },
+      { id: 3, title: "Blood Strike", tag: "FPS", currency: "Gold", image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&auto=format&fit=crop" },
+      { id: 4, title: "Free Fire", tag: "BR", currency: "Diamonds", image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=400&auto=format&fit=crop" }
+    ];
+
+    function getAllGames() {
+      return JSON.parse(localStorage.getItem('admin_games')) || DEFAULT_GAMES;
+    }
+
+    function renderGames(gamesList) {
+      const container = document.getElementById('gameGridContainer');
+      const emptyState = document.getElementById('searchEmptyState');
+      const currentCorner = SEASONS_DATA[activeSeasonKey]?.corner || '🎉';
+      container.innerHTML = '';
+
+      if (!gamesList || gamesList.length === 0) {
+        emptyState.classList.remove('hidden');
+        return;
+      }
+      emptyState.classList.add('hidden');
+
+      gamesList.forEach(game => {
+        const card = document.createElement('div');
+        card.onclick = () => window.location.href = 'payment.html';
+
+        card.className = "bg-white/80 dark:bg-[#111827]/80 border border-slate-200/80 dark:border-white/10 rounded-2xl overflow-hidden shadow-sm active:scale-95 transition cursor-pointer relative group backdrop-blur-sm";
+        card.innerHTML = `
+          <span class="absolute top-1 right-1 text-sm z-10 pointer-events-none drop-shadow">${currentCorner}</span>
+          <div class="relative aspect-square overflow-hidden bg-slate-800">
+            <img src="${game.image}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="${game.title}">
+            <span class="absolute top-1.5 left-1.5 bg-brand-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow">${game.tag}</span>
+          </div>
+          <div class="p-2">
+            <h4 class="font-bold text-xs truncate text-slate-900 dark:text-white">${game.title}</h4>
+            <div class="flex items-center justify-between text-[10px] text-slate-400 mt-0.5">
+              <span>💎 ${game.currency}</span>
+              <i class="fa-solid fa-circle-chevron-right text-brand-500"></i>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function handleGameSearch(query) {
+      const clearBtn = document.getElementById('clearSearchBtn');
+      const val = query.trim().toLowerCase();
+      if (val) clearBtn.classList.remove('hidden');
+      else clearBtn.classList.add('hidden');
+
+      const allGames = getAllGames();
+      const filtered = allGames.filter(g => 
+        g.title.toLowerCase().includes(val) || 
+        g.tag.toLowerCase().includes(val) || 
+        g.currency.toLowerCase().includes(val)
+      );
+      renderGames(filtered);
+    }
+
+    function clearSearch() {
+      const input = document.getElementById('gameSearchInput');
+      input.value = '';
+      document.getElementById('clearSearchBtn').classList.add('hidden');
+      renderGames(getAllGames());
+      input.focus();
+    }
+
+    const slides = document.querySelectorAll('.banner-slide');
+    const dots = document.querySelectorAll('#carouselDots button');
+    let currentIndex = 0;
+    const totalSlides = slides.length;
+
+    function updateCarousel() {
+      slides.forEach((slide, i) => {
+        let diff = (i - currentIndex) % totalSlides;
+        if (diff < -Math.floor(totalSlides / 2)) diff += totalSlides;
+        if (diff > Math.floor(totalSlides / 2)) diff -= totalSlides;
+
+        slide.style.pointerEvents = 'auto';
+
+        if (diff === 0) {
+          slide.style.transform = 'translateX(0) scale(1)';
+          slide.style.opacity = '1';
+          slide.style.filter = 'brightness(1) blur(0px)';
+          slide.style.zIndex = '20';
+        } else if (diff === -1) {
+          slide.style.transform = 'translateX(-48%) scale(0.82)';
+          slide.style.opacity = '0.45';
+          slide.style.filter = 'brightness(0.55) blur(1.5px)';
+          slide.style.zIndex = '10';
+        } else if (diff === 1) {
+          slide.style.transform = 'translateX(48%) scale(0.82)';
+          slide.style.opacity = '0.45';
+          slide.style.filter = 'brightness(0.55) blur(1.5px)';
+          slide.style.zIndex = '10';
+        } else {
+          const direction = diff < 0 ? -1 : 1;
+          slide.style.transform = `translateX(${direction * 85}%) scale(0.65)`;
+          slide.style.opacity = '0';
+          slide.style.filter = 'brightness(0.2) blur(3px)';
+          slide.style.zIndex = '1';
+          slide.style.pointerEvents = 'none';
+        }
+      });
+
+      dots.forEach((dot, i) => {
+        if (i === currentIndex) {
+          dot.className = 'w-5 h-1.5 rounded-full bg-brand-500 transition-all duration-300';
+        } else {
+          dot.className = 'w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-white/20 transition-all duration-300';
+        }
+      });
+    }
+
+    function nextSlide() { currentIndex = (currentIndex + 1) % totalSlides; updateCarousel(); }
+    function prevSlide() { currentIndex = (currentIndex - 1 + totalSlides) % totalSlides; updateCarousel(); }
+    function goToSlide(index) { currentIndex = index; updateCarousel(); }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      checkMaintenanceLive();
+      updateAuthUI();
+      syncLogoAndBrandFromAdmin();
+      loadActiveSeasonFromAdmin();
+      loadNotifications();
+      renderGames(getAllGames());
+      updateCarousel();
+      checkAndShowWelcomeAlert();
+      setInterval(nextSlide, 3500);
+
+      // စတင်ချိန်တွင် Cloud မှ Admin ဒေတာအားလုံး ဆွဲယူခြင်း
+      pollMaintenanceStatus();
+      syncFromCloudDatabase();
+    });
+  </script>
+
+
+</body>
+</html>
