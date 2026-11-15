@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="my"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090e1d"><title>Lucky Spin | KAVXY</title><link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Padauk:wght@400;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"><style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% 12%,#26345c 0,#101a31 38%,#080d19 80%);color:#f8fafc;font-family:Outfit,Padauk,sans-serif;padding:0 16px 110px}.wrap{max-width:440px;margin:auto}.top{height:72px;display:flex;align-items:center;justify-content:space-between}.back{color:#dbe5ff;text-decoration:none;background:#ffffff12;border:1px solid #ffffff1b;border-radius:13px;padding:11px 13px}.brand{font-size:14px;font-weight:900;letter-spacing:2px;color:#fbbf24}.pill{font-size:10px;color:#fbbf24;border:1px solid #fbbf2455;background:#fbbf2415;border-radius:30px;padding:7px 10px;font-weight:800}.hero{text-align:center;padding:10px 0 18px}.eyebrow{font-size:11px;letter-spacing:2.5px;color:#fbbf24;font-weight:800}.hero h1{font-size:29px;line-height:1.3;margin:8px 0;font-weight:900}.hero p{font-size:12px;color:#aebbd0;line-height:1.8;margin:0}.panel{border:1px solid #ffffff19;border-radius:28px;padding:22px 16px;background:linear-gradient(150deg,#ffffff10,#ffffff04);box-shadow:0 20px 60px #0005;text-align:center}.wheel-wrap{width:min(100%,340px);aspect-ratio:1;margin:0 auto 20px;position:relative;filter:drop-shadow(0 12px 24px #0008)}canvas{width:100%;height:100%;display:block}.pointer{position:absolute;top:-9px;left:50%;transform:translateX(-50%);z-index:2;width:0;height:0;border-left:15px solid transparent;border-right:15px solid transparent;border-top:31px solid #fff3c4;filter:drop-shadow(0 2px 4px #0009)}.center-label{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);height:65px;width:65px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#fff1a9,#f59e0b);color:#713f12;font-size:13px;font-weight:900;border:6px solid #fff8;box-shadow:0 4px 12px #0007;pointer-events:none}.result{min-height:54px;display:grid;place-items:center;font-size:14px;font-weight:800;color:#fcd34d;line-height:1.5}.spin-btn{width:100%;border:0;border-radius:16px;background:linear-gradient(110deg,#fde68a,#f59e0b);color:#342008;font:900 16px Outfit,Padauk,sans-serif;padding:17px;cursor:pointer;box-shadow:0 9px 24px #f59e0b35;transition:transform .15s}.spin-btn:active{transform:scale(.98)}.spin-btn:disabled{opacity:.6;cursor:wait}.info{margin-top:18px;border:1px solid #ffffff17;border-radius:20px;background:#ffffff08;padding:16px;display:flex;align-items:flex-start;gap:12px}.info i{color:#fbbf24;margin-top:2px}.info strong{font-size:12px}.info p{color:#aebbd0;font-size:11px;line-height:1.9;margin:5px 0 0}.bottom{position:fixed;bottom:12px;left:12px;right:12px;max-width:440px;margin:auto;border-radius:21px;border:1px solid #ffffff24;background:#141e31ed;backdrop-filter:blur(16px);box-shadow:0 8px 32px #0008;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));padding:11px 5px;z-index:5}.bottom a{color:#9caac1;text-decoration:none;text-align:center;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:10px;font-weight:700;min-width:0}.bottom i{font-size:18px}.bottom a.active{color:#fbbf24}.bottom a span{white-space:nowrap}@media(max-width:350px){.hero h1{font-size:24px}.panel{padding:20px 10px}.bottom a{font-size:9px}}
+
+
+/* Shared Index/Admin event themes */
+body{transition:background .5s ease}
+body.theme-general{background:radial-gradient(ellipse at 50% 12%,#26345c 0,#101a31 38%,#080d19 80%)}
+body.theme-summer{background:radial-gradient(circle at 50% 10%,#3d2003 0%,#170d03 55%,#090602 100%)}
+body.theme-rainy{background:radial-gradient(circle at 50% 10%,#0f2b38 0%,#071922 60%,#030d12 100%)}
+body.theme-winter{background:radial-gradient(circle at 50% 10%,#0c2744 0%,#061526 55%,#020912 100%)}
+body.theme-thingyan{background:radial-gradient(circle at 50% 12%,#382405 0%,#0d2d3e 50%,#04141c 100%)}
+body.theme-thadingyut{background:radial-gradient(circle at 50% 10%,#341a06 0%,#150901 60%,#080300 100%)}
+body.theme-summer .pill,body.theme-thadingyut .pill{color:#fcd34d;border-color:#fbbf2466}
+body.theme-rainy .pill,body.theme-winter .pill{color:#7dd3fc;border-color:#38bdf866}
+.event-subtitle{font-size:11px;color:#cbd5e1;font-weight:700;margin-top:6px}
+@media(prefers-reduced-motion:reduce){body{transition:none}}
+</style></head><body class="theme-general"><div class="wrap"><header class="top"><a class="back" href="index.html" aria-label="Back to home"><i class="fa-solid fa-arrow-left"></i></a><div class="brand">KAVXY <span style="color:#fff">/ SPIN</span></div><span class="pill" id="spinEventTag"><i class="fa-solid fa-star"></i> GENERAL</span></header><section class="hero"><div class="eyebrow">✦ TRY YOUR LUCK ✦</div><div class="event-subtitle" id="spinEventSubtitle">✨ General Event</div><h1>🎡 ကံစမ်းမဲ လှည့်မယ်</h1><p>ကံကောင်းခြင်းတွေကို စမ်းသပ်ကြည့်လိုက်ပါ</p></section><main class="panel"><div class="wheel-wrap"><div class="pointer" aria-hidden="true"></div><canvas id="wheel" width="720" height="720" role="img" aria-label="Lucky Spin Wheel"></canvas><div class="center-label">SPIN</div></div><div class="result" id="result" aria-live="polite">အဆင်သင့်ဖြစ်ပြီလား? ✨</div><button id="spinBtn" class="spin-btn"><i class="fa-solid fa-dharmachakra"></i> ကံစမ်းမဲ လှည့်မယ်</button></main><aside class="info"><i class="fa-solid fa-circle-info"></i><div><strong>Lucky Spin အကြောင်း</strong><p>ဤစနစ်သည် စမ်းသပ်အသုံးပြုရန် Demo ဖြစ်ပါသည်။ ငွေသား၊ ပွိုင့် သို့မဟုတ် အမှန်တကယ် ဆုလက်ဆောင်များ မပေးပါ။</p></div></aside></div><nav class="bottom" aria-label="Bottom navigation"><a href="index.html"><i class="fa-solid fa-house"></i><span>Home</span></a><a href="payment.html"><i class="fa-solid fa-wallet"></i><span>Top-Up</span></a><a href="order.html"><i class="fa-solid fa-receipt"></i><span>Order</span></a><a class="active" href="spin.html" aria-current="page"><i class="fa-solid fa-dharmachakra"></i><span>Spin</span></a><a href="profile.html"><i class="fa-solid fa-user"></i><span>Profile</span></a></nav><script>
+// Read the same event key as Index, Payment and Order pages.
+(()=>{
+  const DB_URL='https://kavxy-5d60f-default-rtdb.firebaseio.com/';
+  const EVENTS={
+    general:{tag:'GENERAL',label:'✨ General Event',icon:'✨'},
+    summer:{tag:'SUMMER',label:'🌴 Summer Event',icon:'🌴'},
+    rainy:{tag:'MONSOON',label:'🌧️ Rainy Event',icon:'🌧️'},
+    winter:{tag:'WINTER',label:'❄️ Winter Event',icon:'❄️'},
+    thingyan:{tag:'THINGYAN',label:'🌼 Thingyan Event',icon:'🌼'},
+    thadingyut:{tag:'THADINGYUT',label:'🏮 Thadingyut Event',icon:'🏮'}
+  };
+  let active='general';
+  function apply(key){
+    if(!Object.prototype.hasOwnProperty.call(EVENTS,key))return;
+    active=key;
+    document.body.classList.remove(...Object.keys(EVENTS).map(k=>'theme-'+k));
+    document.body.classList.add('theme-'+key);
+    document.getElementById('spinEventTag').textContent=EVENTS[key].icon+' '+EVENTS[key].tag;
+    document.getElementById('spinEventSubtitle').textContent=EVENTS[key].label;
+  }
+  function readLocal(){
+    try{const config=JSON.parse(localStorage.getItem('site_event_theme_config')||'{}');
+      if(config&&typeof config.activeMode==='string')apply(config.activeMode);
+    }catch(_){/* ignore invalid local data */}
+  }
+  async function syncCloud(){
+    try{
+      const response=await fetch(DB_URL+'active_season.json',{cache:'no-store'});
+      if(!response.ok)return;
+      const key=await response.json();
+      if(typeof key==='string'&&Object.prototype.hasOwnProperty.call(EVENTS,key)){
+        apply(key);
+        localStorage.setItem('site_event_theme_config',JSON.stringify({activeMode:key}));
+      }
+    }catch(_){/* offline: preserve last known event */}
+  }
+  readLocal();syncCloud();
+  window.addEventListener('storage',e=>{if(e.key==='site_event_theme_config')readLocal()});
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)syncCloud()});
+  setInterval(syncCloud,15000);
+})();
+</script><script>
+(()=>{const canvas=document.getElementById('wheel'),ctx=canvas.getContext('2d'),btn=document.getElementById('spinBtn'),result=document.getElementById('result');const labels=['LUCKY','STAR','SMILE','MAGIC','HAPPY','CHEERS'],icons=['✦','★','♥','✧','☀','✿'],colors=['#f59e0b','#0ea5e9','#8b5cf6','#10b981','#ec4899','#f97316'];const N=labels.length,step=2*Math.PI/N,R=360;let angle=0,busy=false;function draw(a){ctx.clearRect(0,0,720,720);ctx.save();ctx.translate(R,R);ctx.beginPath();ctx.arc(0,0,346,0,2*Math.PI);ctx.fillStyle='#fcd34d';ctx.fill();ctx.beginPath();ctx.arc(0,0,330,0,2*Math.PI);ctx.fillStyle='#101827';ctx.fill();for(let i=0;i<N;i++){let mid=a+i*step-Math.PI/2,start=mid-step/2;ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,321,start,start+step);ctx.closePath();ctx.fillStyle=colors[i];ctx.fill();ctx.strokeStyle='#ffffff66';ctx.lineWidth=3;ctx.stroke();ctx.save();ctx.rotate(mid);ctx.textAlign='center';ctx.fillStyle='white';ctx.shadowColor='#0008';ctx.shadowBlur=5;ctx.font='bold 38px sans-serif';ctx.fillText(icons[i],0,-238);ctx.font='900 19px Outfit,sans-serif';ctx.fillText(labels[i],0,-188);ctx.restore()}for(let i=0;i<24;i++){const t=i*Math.PI/12;ctx.beginPath();ctx.arc(Math.cos(t)*338,Math.sin(t)*338,5,0,2*Math.PI);ctx.fillStyle=i%2?'#fff9d5':'#f59e0b';ctx.fill()}ctx.restore()}draw(angle);btn.addEventListener('click',()=>{if(busy)return;busy=true;btn.disabled=true;result.textContent='လှည့်နေပါသည်…';const pick=Math.floor(Math.random()*N),target=(((-pick*step)%(2*Math.PI))+2*Math.PI)%(2*Math.PI),current=((angle%(2*Math.PI))+2*Math.PI)%(2*Math.PI),delta=(target-current+2*Math.PI)%(2*Math.PI),start=angle,dist=2*Math.PI*6+delta,t0=performance.now(),duration=4200;function tick(now){let t=Math.min(1,(now-t0)/duration),ease=1-Math.pow(1-t,5);angle=start+dist*ease;draw(angle);if(t<1)requestAnimationFrame(tick);else{angle=(start+dist)%(2*Math.PI);busy=false;btn.disabled=false;result.textContent='🎉 '+labels[pick]+' — Demo ရလဒ်';}}requestAnimationFrame(tick)})})();
+</script></body></html>
