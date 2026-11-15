@@ -313,7 +313,7 @@
   </div>
 
   <!-- PRE-MAINTENANCE OVERLAY SCREEN -->
-  <div id="maintenanceOverlay" class="fixed inset-0 bg-[#090d16]/95 backdrop-blur-xl z-50 hidden flex flex-col items-center justify-center p-6 text-center">
+  <div id="maintenanceOverlay" class="fixed inset-0 bg-[#090d16]/95 backdrop-blur-xl z-[99999998] hidden flex flex-col items-center justify-center p-6 text-center">
     <div class="max-w-xs w-full space-y-4">
       <div class="relative w-20 h-20 mx-auto flex items-center justify-center">
         <div class="absolute inset-0 rounded-full bg-amber-500/20 animate-ping"></div>
@@ -325,9 +325,9 @@
         <span class="inline-block px-3 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-500 text-[9px] font-black uppercase tracking-wider">
           System Pre-Maintenance
         </span>
-        <h2 class="text-base font-black text-white">စနစ် ကြိုတင်ပြင်ဆင်နေပါသည်</h2>
+        <h2 class="text-base font-black text-white">ပြင်ဆင်နေပါသည်</h2>
         <p id="maintDisplayNotice" class="text-xs text-slate-400 leading-relaxed">
-          ပိုမိုကောင်းမွန်သော ဝန်ဆောင်မှု ပေးနိုင်ရန် ဆာဗာအား ခေတ္တ ပြင်ဆင်ထိန်းသိမ်းနေပါသည်။ မကြာမီ ပြန်လည်ဖွင့်လှစ်ပေးပါမည်။
+          ဆာဗာအား ခေတ္တ ပြင်ဆင်ထိန်းသိမ်းနေပါသည်။ မကြာမီ ပြန်လည်ဖွင့်လှစ်ပေးပါမည်။
         </p>
       </div>
       <div id="maintEstTimeTag" class="hidden px-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/10 text-[11px] text-amber-400 font-mono">
@@ -602,7 +602,7 @@
   <!-- ==================== JAVASCRIPT: ADMIN REALTIME CLOUD SYNC ENGINE ==================== -->
   <script>
     const NOTIF_STORAGE_KEY = 'site_admin_broadcast_notifs';
-    const FIREBASE_DB_URL = "https://kavxy-5d60f-default-rtdb.firebaseio.com/";
+    const FIREBASE_DB_URL = "https://kavxygameshop-default-rtdb.asia-southeast1.firebasedatabase.app/";
     const CURRENT_APP_VERSION = "1.0.0";
 
     // ------------------------------------------------------------
@@ -642,9 +642,19 @@
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000);
       try {
-        const res = await fetch(`${FIREBASE_DB_URL}.json`, {signal:controller.signal, cache:'no-store'});
-        if (!res.ok) throw new Error('Cloud HTTP ' + res.status);
-        const data = await res.json();
+        // Read only public child nodes. Firebase Rules intentionally deny root reads.
+        const publicNodes = [
+          'site_maintenance', 'site_maintenance_msg', 'maint_est_time',
+          'app_version_config', 'site_platform_config'
+        ];
+        const results = await Promise.all(publicNodes.map(async (node) => {
+          const response = await fetch(`${FIREBASE_DB_URL}${node}.json`, {
+            signal: controller.signal, cache: 'no-store'
+          });
+          if (!response.ok) throw new Error(`${node} HTTP ${response.status}`);
+          return [node, await response.json()];
+        }));
+        const data = Object.fromEntries(results);
         hideRocketOffline();
         if (!data) {
           applyMaintenanceCloudState(false, '', '');
