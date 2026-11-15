@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="my" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" id="viewportMeta" />
+  <title>GameAdmin - Master Dashboard</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            dashboard: {
+              bg: '#0a0f1d',
+              card: '#0e1629',
+              sidebar: '#080d19',
+              border: 'rgba(255, 255, 255, 0.07)',
+              accent: '#3b82f6'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Font Awesome Icons & Google Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Padauk:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      font-family: 'Outfit', 'Padauk', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    .custom-scroll::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 9999px;
+    }
+    /* Forced Desktop View Styles */
+    body.forced-desktop {
+      min-width: 1200px !important;
+      overflow-x: auto !important;
+    }
+    body.forced-desktop #desktopSidebar {
+      display: flex !important;
+    }
+    body.forced-desktop #mobileBottomBar {
+      display: none !important;
+    }
+  </style>
+</head>
+
+<body class="bg-[#f4f6fa] dark:bg-[#0a0f1d] text-slate-800 dark:text-gray-100 min-h-screen flex overflow-x-hidden">
+
+  <!-- ==================== TOAST ALERT ==================== -->
+  <div id="toastAlert" class="fixed top-5 right-5 z-50 transform translate-x-full transition-transform duration-300 max-w-sm w-full px-4 pointer-events-none">
+    <div class="flex items-center gap-3 p-3.5 rounded-2xl bg-white dark:bg-[#0e1629] border border-slate-200 dark:border-white/10 shadow-2xl pointer-events-auto">
+      <div id="toastIconBox" class="w-10 h-10 rounded-xl bg-blue-500/15 text-blue-500 flex items-center justify-center text-lg shrink-0">
+        <i id="toastIcon" class="fa-solid fa-circle-check"></i>
+      </div>
+      <div class="flex-1">
+        <h4 id="toastTitle" class="text-xs font-bold text-slate-900 dark:text-white">အသိပေးချက်</h4>
+        <p id="toastMessage" class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">အောင်မြင်ပါသည်</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SIDEBAR NAVIGATION (DESKTOP MODE) ==================== -->
+  <aside id="desktopSidebar" class="w-64 bg-white dark:bg-[#080d19] border-r border-slate-200 dark:border-white/5 flex-col justify-between shrink-0 hidden lg:flex">
+    <div>
+      <div class="px-6 py-5 flex items-center gap-3 border-b border-slate-200 dark:border-white/5">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-sky-400 text-white flex items-center justify-center text-lg shadow-lg shadow-blue-500/20 font-black">
+          <i class="fa-solid fa-gamepad"></i>
+        </div>
+        <div>
+          <h1 class="text-base font-extrabold text-slate-900 dark:text-white tracking-wide" id="sidebarBrandName">GameAdmin</h1>
+          <p class="text-[10px] text-blue-500 font-mono">Control Panel Hub</p>
+        </div>
+      </div>
+
+      <!-- Navigation Links: Image ကို Premium Emoji အပေါ်တွင် ထားရှိထားပါသည် -->
+      <nav class="p-4 space-y-1 text-xs font-semibold">
+        <a href="admin.html" class="flex items-center gap-3 px-3.5 py-3 rounded-2xl bg-blue-600 text-white shadow-lg shadow-blue-600/30 transition">
+          <i class="fa-solid fa-house text-sm w-4 text-center"></i>
+          <span>Home Dashboard</span>
+        </a>
+        
+        <!-- ၁။ AImage (Banners) - Premium Emoji အပေါ်တွင် ရောက်ရှိသွားပါပြီ -->
+        <a href="Aimage.html" class="flex items-center gap-3 px-3.5 py-3 rounded-2xl text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.03] transition">
+          <i class="fa-solid fa-images text-sm w-4 text-center text-sky-400"></i>
+          <span>Banners (AImage)</span>
+        </a>
+
+        <!-- ၂။ APremiumemoji (11 Tiers) -->
+        <a href="APremiumemoji.html" class="flex items-center gap-3 px-3.5 py-3 rounded-2xl text-amber-500 hover:bg-slate-100 dark:hover:bg-white/[0.03] transition">
+          <i class="fa-solid fa-crown text-sm w-4 text-center"></i>
+          <span>Premium Emoji (11 Tiers)</span>
+        </a>
+
+        <a href="APayment.html" class="flex items-center gap-3 px-3.5 py-3 rounded-2xl text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.03] transition">
+          <i class="fa-solid fa-credit-card text-sm w-4 text-center"></i>
+          <span>Payments & Slips</span>
+        </a>
+        <a href="AEvent.html" class="flex items-center gap-3 px-3.5 py-3 rounded-2xl text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.03] transition">
+          <i class="fa-solid fa-wand-magic-sparkles text-sm w-4 text-center text-amber-400"></i>
+          <span>Events & Seasons</span>
+        </a>
+        <a href="AOrder.html" class="flex items-center gap-3 px-3.5 py-3 rounded-2xl text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.03] transition">
+          <i class="fa-solid fa-file-lines text-sm w-4 text-center"></i>
+          <span>Orders Management</span>
+        </a>
+        <a href="Asetting.html" class="flex items-center gap-3 px-3.5 py-3 rounded-2xl text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.03] transition">
+          <i class="fa-solid fa-gear text-sm w-4 text-center"></i>
+          <span>Settings (Asetting)</span>
+        </a>
+      </nav>
+    </div>
+
+    <div class="p-4">
+      <a href="index.html" target="_blank" class="w-full py-2.5 rounded-xl bg-slate-100 dark:bg-white/[0.03] hover:bg-slate-200 dark:hover:bg-white/[0.08] text-slate-700 dark:text-slate-300 font-bold text-xs flex items-center justify-center gap-2 border border-slate-200 dark:border-white/5 transition">
+        <i class="fa-solid fa-arrow-up-right-from-square text-xs text-blue-500"></i>
+        <span>Live Index ကြည့်မည်</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- ==================== MAIN DASHBOARD WORKSPACE ==================== -->
+  <div class="flex-1 flex flex-col min-w-0 overflow-y-auto custom-scroll pb-20 lg:pb-6">
+    
+    <!-- Top Header Bar -->
+    <header class="h-16 border-b border-slate-200 dark:border-white/5 bg-white/90 dark:bg-[#0a0f1d]/90 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30">
+      <div class="flex items-center gap-3">
+        <div>
+          <h2 class="text-sm font-extrabold text-slate-900 dark:text-white leading-tight">Master Control Dashboard</h2>
+          <span class="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Cloud Sync Status
+          </span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Switcher: ဖုန်းဗားရှင်း / PC ဗားရှင်း -->
+        <button onclick="toggleDeviceLayout()" id="deviceToggleBtn" class="px-2.5 py-1.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-500 font-bold text-xs flex items-center gap-1.5 active:scale-95 transition" title="ဗားရှင်းပြောင်းမည်">
+          <i id="deviceToggleIcon" class="fa-solid fa-desktop"></i>
+          <span id="deviceToggleText">PC ဗားရှင်း</span>
+        </button>
+
+        <!-- Light / Dark Toggle -->
+        <button onclick="toggleTheme()" class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 text-xs font-bold text-slate-700 dark:text-slate-200 flex items-center justify-center active:scale-95 transition">
+          <i id="themeToggleIcon" class="fa-solid fa-moon text-blue-500"></i>
+        </button>
+
+        <a href="APayment.html" class="relative w-8 h-8 rounded-xl bg-slate-100 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-600 dark:text-slate-300">
+          <i class="fa-solid fa-receipt text-xs"></i>
+          <span class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[9px] font-black flex items-center justify-center" id="notifBadge">0</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="p-4 sm:p-6 space-y-6">
+
+      <!-- ==================== QUICK PORTAL CARDS (AIMAGE အပေါ်တွင် ထားရှိထားသည်) ==================== -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <!-- ၁။ AImage (Banners) Box -->
+        <a href="Aimage.html" class="p-3.5 rounded-2xl bg-white dark:bg-[#0e1629] border border-slate-200 dark:border-white/5 hover:border-sky-500 transition flex items-center gap-3 shadow-sm group">
+          <div class="w-10 h-10 rounded-xl bg-sky-500/15 text-sky-400 flex items-center justify-center text-base shrink-0 group-hover:scale-110 transition">
+            <i class="fa-solid fa-images"></i>
+          </div>
+          <div class="overflow-hidden">
+            <h4 class="font-bold text-xs text-slate-900 dark:text-white truncate">AImage (Banners)</h4>
+            <span class="text-[9px] text-slate-400 block truncate">Gallery ပုံ ၅ ပုံ ပြင်ရန်</span>
+          </div>
+        </a>
+
+        <!-- ၂။ APremiumemoji (Emoji Tiers) Box -->
+        <a href="APremiumemoji.html" class="p-3.5 rounded-2xl bg-white dark:bg-[#0e1629] border border-slate-200 dark:border-white/5 hover:border-purple-500 transition flex items-center gap-3 shadow-sm group">
+          <div class="w-10 h-10 rounded-xl bg-purple-500/15 text-purple-500 flex items-center justify-center text-base shrink-0 group-hover:scale-110 transition">
+            <i class="fa-solid fa-crown"></i>
+          </div>
+          <div class="overflow-hidden">
+            <h4 class="font-bold text-xs text-slate-900 dark:text-white truncate">Emoji Tiers</h4>
+            <span class="text-[9px] text-slate-400 block truncate">11 ဇီးကွက် Badges</span>
+          </div>
+        </a>
+
+        <!-- ၃။ APayment Box -->
+        <a href="APayment.html" class="p-3.5 rounded-2xl bg-white dark:bg-[#0e1629] border border-slate-200 dark:border-white/5 hover:border-blue-500 transition flex items-center gap-3 shadow-sm group">
+          <div class="w-10 h-10 rounded-xl bg-blue-500/15 text-blue-500 flex items-center justify-center text-base shrink-0 group-hover:scale-110 transition">
+            <i class="fa-solid fa-credit-card"></i>
+          </div>
+          <div class="overflow-hidden">
+            <h4 class="font-bold text-xs text-slate-900 dark:text-white truncate">APayment</h4>
+            <span class="text-[9px] text-slate-400 block truncate">KPay, Wave, Slips</span>
+          </div>
+        </a>
+
+        <!-- ၄။ AEvent Box -->
+        <a href="AEvent.html" class="p-3.5 rounded-2xl bg-white dark:bg-[#0e1629] border border-slate-200 dark:border-white/5 hover:border-amber-500 transition flex items-center gap-3 shadow-sm group">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/15 text-amber-500 flex items-center justify-center text-base shrink-0 group-hover:scale-110 transition">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+          </div>
+          <div class="overflow-hidden">
+            <h4 class="font-bold text-xs text-slate-900 dark:text-white truncate">AEvent</h4>
+            <span class="text-[9px] text-slate-400 block truncate">Theme & ပွဲတော်များ</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Secure Firebase admin sign-in (password stays in memory only for sign-in request) -->
+      <section class="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#0e1629] border border-blue-500/20 space-y-3 shadow-sm" aria-label="Firebase Admin Login">
+        <div class="flex items-center justify-between gap-2"><h3 class="text-xs font-black"><i class="fa-solid fa-shield-halved text-blue-400 mr-2"></i>Firebase Admin Login</h3><span id="adminAuthStatus" class="text-[10px] text-amber-400">Login လိုအပ်သည်</span></div>
+        <p class="text-[11px] text-slate-400">Firebase Console → Project settings → Web API Key ထည့်ပါ။ Authentication → Email/Password ဖွင့်ပြီး Admin account ကို ဖန်တီးပါ။ Database Rules တွင် Admin UID ကို ခွင့်ပြုရပါမည်။</p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <input id="firebaseApiKey" type="text" autocomplete="off" placeholder="Firebase Web API Key" class="min-w-0 px-3 py-2 rounded-xl bg-slate-50 dark:bg-[#080d19] border border-white/10 text-xs outline-none" />
+          <input id="firebaseAdminEmail" type="email" autocomplete="username" placeholder="Admin Email" class="min-w-0 px-3 py-2 rounded-xl bg-slate-50 dark:bg-[#080d19] border border-white/10 text-xs outline-none" />
+          <input id="firebaseAdminPassword" type="password" autocomplete="current-password" placeholder="Password" class="min-w-0 px-3 py-2 rounded-xl bg-slate-50 dark:bg-[#080d19] border border-white/10 text-xs outline-none" />
+        </div>
+        <div class="flex gap-2"><button type="button" onclick="firebaseAdminSignIn()" class="flex-1 py-2.5 rounded-xl bg-blue-600 text-white text-xs font-bold">Admin Login</button><button type="button" onclick="firebaseAdminSignOut()" class="px-4 py-2.5 rounded-xl bg-slate-700 text-white text-xs font-bold">Logout</button></div>
+      </section>
+
+      <!-- ==================== 1. PRE-MAINTENANCE CONTROLLER (ALL USERS) ==================== -->
+      <div class="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#0e1629] border border-slate-200/80 dark:border-white/5 space-y-4 shadow-sm">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div id="maintStatusIcon" class="w-10 h-10 rounded-xl bg-amber-500/15 text-amber-500 flex items-center justify-center text-lg">
+              <i class="fa-solid fa-screwdriver-wrench"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h3 class="text-xs font-bold text-slate-900 dark:text-white">Pre-Maintenance စနစ် (All Users တစ်ပြိုင်နက် ပိတ်/ဖွင့်)</h3>
+                <span id="maintStatusBadge" class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-slate-100 dark:bg-white/5 text-slate-400">OFFLINE</span>
+              </div>
+              <p class="text-[11px] text-slate-400 mt-0.5">ဖွင့်ထားပါက User အားလုံးထံ index.html အစား ပြင်ဆင်နေပါသည် ဟူ၍ ပိတ်ထားပေးမည်</p>
+            </div>
+          </div>
+
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="preMaintToggle" class="sr-only peer" onchange="togglePreMaint(this.checked)">
+            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-amber-500"></div>
+          </label>
+        </div>
+
+        <div id="maintSettingsPanel" class="hidden pt-4 border-t border-slate-100 dark:border-white/5 space-y-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div>
+              <label class="text-[11px] font-semibold text-slate-400 block mb-1">ပြင်ဆင်ပြီးစီးမည့် ခန့်မှန်းရက်/အချိန်:</label>
+              <input type="text" id="maintEstimatedTime" placeholder="ဥပမာ - 08:30 PM (MST)" class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-[#080d19] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white outline-none">
+            </div>
+            <div>
+              <label class="text-[11px] font-semibold text-slate-400 block mb-1">Admin Access (Firebase Auth လိုအပ်):</label>
+              <input type="text" id="adminPasscode" placeholder="အပေါ်က Firebase Admin Login ကို အသုံးပြုပါ" readonly class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-[#080d19] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white font-mono outline-none">
+            </div>
+          </div>
+
+          <div class="text-xs">
+            <label class="text-[11px] font-semibold text-slate-400 block mb-1">User ထံ ပြသမည့် အသိပေးစာသား:</label>
+            <textarea id="maintNoticeText" rows="2" class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-[#080d19] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white outline-none focus:border-amber-500">ဆာဗာအား ခေတ္တ ပြင်ဆင်ထိန်းသိမ်းနေပါသည်။ မကြာမီ ပြန်လည်ဖွင့်လှစ်ပေးပါမည်။</textarea>
+          </div>
+
+          <button onclick="savePreMaintConfig()" class="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-black font-black text-xs transition active:scale-95 shadow">
+            Maintenance စာတန်း Cloud ပေါ်သို့ သိမ်းဆည်းမည်
+          </button>
+        </div>
+      </div>
+
+      <!-- ==================== 2. VERSION UPDATE PUSHER ==================== -->
+      <div class="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#0e1629] border border-slate-200/80 dark:border-white/5 space-y-3 shadow-sm">
+        <div class="flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-2.5">
+          <i class="fa-solid fa-cloud-arrow-down text-sky-400"></i>
+          <span class="text-xs font-black text-slate-900 dark:text-white">Version Update Pusher (All Users ထံသို့ ဒေါင်းလုဒ် Bar လွှင့်တင်ရန်)</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+          <div>
+            <label class="text-[10px] text-slate-400 font-bold block mb-1">ဗားရှင်းအသစ် နံပါတ်:</label>
+            <input type="text" id="newVerInput" placeholder="ဥပမာ- 1.0.1" class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-[#080d19] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white font-mono font-bold outline-none focus:border-sky-500">
+          </div>
+          <div class="sm:col-span-2">
+            <label class="text-[10px] text-slate-400 font-bold block mb-1">Update စာတန်း:</label>
+            <input type="text" id="updateMsgInput" placeholder="ပိုမိုကောင်းမွန်မြန်ဆန်သော စနစ်သစ်သို့ အဆင့်မြှင့်တင်ရန် ဒေါင်းလုဒ်ရယူပါ။" class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-[#080d19] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white outline-none focus:border-sky-500">
+          </div>
+        </div>
+
+        <button onclick="pushVersionUpdate()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 text-white font-black text-xs transition active:scale-95 shadow">
+          <i class="fa-solid fa-rocket mr-1"></i> Version Update အား All Users ထံ ချက်ချင်းလွှင့်မည်
+        </button>
+      </div>
+
+      <!-- ==================== 3. BRAND & LOGO MANAGER ==================== -->
+      <div class="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#0e1629] border border-slate-200/80 dark:border-white/5 space-y-3 shadow-sm">
+        <div class="flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-2.5">
+          <i class="fa-solid fa-image text-emerald-400"></i>
+          <span class="text-xs font-black text-slate-900 dark:text-white">Brand Name & Logo Manager (အမည်နှင့် Logo ပြောင်းရန်)</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+          <div>
+            <label class="text-[10px] text-slate-400 font-bold block mb-1">ဝက်ဘ်ဆိုက်အမည် (Name):</label>
+            <input type="text" id="brandNameInput" placeholder="KAVXY" class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-[#080d19] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white font-bold outline-none focus:border-emerald-500">
+          </div>
+          <div>
+            <label class="text-[10px] text-slate-400 font-bold block mb-1">Logo ဓာတ်ပုံ Link (URL):</label>
+            <input type="text" id="brandLogoInput" placeholder="https://example.com/logo.png" class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-[#080d19] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white outline-none focus:border-emerald-500">
+          </div>
+        </div>
+
+        <button onclick="saveBrandSettings()" class="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs transition active:scale-95 shadow">
+          Logo နှင့် အမည် သိမ်းဆည်းမည် (User အားလုံးထံ ချက်ချင်းပြောင်းမည်)
+        </button>
+      </div>
+
+      <!-- ==================== 4. DUAL CHARTS SECTION ==================== -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#0e1629] border border-slate-200/80 dark:border-white/5 space-y-3 shadow-sm">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-bold text-slate-900 dark:text-white">Order Overview (နမူနာဒေတာ)</h3>
+            <span class="text-[10px] text-slate-400 font-mono">Demo Data</span>
+          </div>
+          <div class="h-44 relative">
+            <canvas id="orderOverviewChart"></canvas>
+          </div>
+        </div>
+
+        <div class="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#0e1629] border border-slate-200/80 dark:border-white/5 space-y-3 shadow-sm">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-bold text-slate-900 dark:text-white">Game Market Share (နမူနာဒေတာ)</h3>
+            <span class="text-[10px] text-slate-400 font-mono">Sample Data</span>
+          </div>
+          <div class="flex items-center gap-4">
+            <div class="w-32 h-32 relative shrink-0">
+              <canvas id="gameTypesChart"></canvas>
+            </div>
+            <div class="space-y-1.5 text-[11px] flex-1">
+              <div class="flex items-center justify-between"><span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-blue-500"></span> MLBB</span><span class="font-bold">56%</span></div>
+              <div class="flex items-center justify-between"><span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-yellow-500"></span> PUBG</span><span class="font-bold">25%</span></div>
+              <div class="flex items-center justify-between"><span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Free Fire</span><span class="font-bold">11%</span></div>
+              <div class="flex items-center justify-between"><span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-purple-500"></span> Other</span><span class="font-bold">8%</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ==================== MOBILE BOTTOM BAR (ဖုန်းဗားရှင်းအတွက် အောက်ခြေမီနူး) ==================== -->
+  <nav id="mobileBottomBar" class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-[#0a0f1d]/95 backdrop-blur-lg border-t border-slate-200 dark:border-white/10 py-2.5 px-4 lg:hidden">
+    <div class="max-w-md mx-auto flex items-center justify-around text-center">
+      <a href="admin.html" class="flex flex-col items-center gap-0.5 text-blue-500"><i class="fa-solid fa-house text-base"></i><span class="text-[10px] font-bold">Admin</span></a>
+      <a href="Aimage.html" class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-blue-500 transition"><i class="fa-solid fa-images text-base"></i><span class="text-[10px] font-semibold">Banner</span></a>
+      <a href="APremiumemoji.html" class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-blue-500 transition"><i class="fa-solid fa-crown text-base"></i><span class="text-[10px] font-semibold">Emoji</span></a>
+      <a href="APayment.html" class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-blue-500 transition"><i class="fa-solid fa-credit-card text-base"></i><span class="text-[10px] font-semibold">Payment</span></a>
+      <a href="AEvent.html" class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-blue-500 transition"><i class="fa-solid fa-wand-magic-sparkles text-base"></i><span class="text-[10px] font-semibold">Event</span></a>
+    </div>
+  </nav>
+
+  <!-- ==================== JAVASCRIPT: LAYOUT & CLOUD ENGINE ==================== -->
+  <script>
+    const FIREBASE_DB_URL = "https://kavxy-5d60f-default-rtdb.firebaseio.com/";
+    const THEME_STORAGE_KEY = 'admin_theme_mode';
+    const LAYOUT_MODE_KEY = 'admin_device_layout_mode';
+
+    let toastTimeout = null;
+    let adminIdToken = null;
+    let adminRefreshToken = null;
+    let adminTokenExpiry = 0;
+    let adminUid = null;
+    function authStatus(message, ok=false) {
+      const el = document.getElementById('adminAuthStatus');
+      if (el) { el.textContent = message; el.className = 'text-[10px] ' + (ok ? 'text-emerald-400' : 'text-amber-400'); }
+    }
+    async function firebaseAdminSignIn() {
+      const apiKey = document.getElementById('firebaseApiKey').value.trim();
+      const email = document.getElementById('firebaseAdminEmail').value.trim();
+      const passwordInput = document.getElementById('firebaseAdminPassword');
+      const password = passwordInput.value;
+      if (!apiKey || !email || !password) return showToast('Login', 'API Key, Email နှင့် Password ထည့်ပါ', 'error');
+      try {
+        const response = await fetch('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=' + encodeURIComponent(apiKey), {
+          method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email,password,returnSecureToken:true})
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error?.message || 'HTTP ' + response.status);
+        adminIdToken = data.idToken; adminRefreshToken = data.refreshToken;
+        adminTokenExpiry = Date.now() + Number(data.expiresIn || 3600)*1000;
+        adminUid = data.localId;
+        passwordInput.value = '';
+        sessionStorage.setItem('kavxy_firebase_api_key',apiKey);
+        authStatus('Login ဝင်ပြီး · UID: ' + adminUid.slice(0,8) + '…', true);
+        showToast('Login အောင်မြင်ပါသည်','Database Rules မှ Admin UID ကို ခွင့်ပြုထားရပါမည်');
+        await fetchCloudData();
+      } catch (e) { authStatus('Login မအောင်မြင်'); showToast('Firebase Login Error',e.message,'error'); }
+    }
+    function firebaseAdminSignOut() {
+      adminIdToken = null; adminRefreshToken = null; adminUid = null; adminTokenExpiry = 0;
+      authStatus('Login လိုအပ်သည်'); showToast('Logout','Admin Session ပိတ်ပြီးပါပြီ','info');
+    }
+    async function getAdminToken() {
+      if (!adminIdToken) throw new Error('Admin Login အရင်ဝင်ပါ');
+      if (Date.now() < adminTokenExpiry - 60000) return adminIdToken;
+      const apiKey = document.getElementById('firebaseApiKey').value.trim();
+      const body = new URLSearchParams({grant_type:'refresh_token',refresh_token:adminRefreshToken});
+      const response = await fetch('https://securetoken.googleapis.com/v1/token?key=' + encodeURIComponent(apiKey), {method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body});
+      const data = await response.json();
+      if (!response.ok) { firebaseAdminSignOut(); throw new Error('Session expired: ' + (data.error?.message || response.status)); }
+      adminIdToken=data.id_token; adminRefreshToken=data.refresh_token;
+      adminTokenExpiry=Date.now()+Number(data.expires_in || 3600)*1000;
+      return adminIdToken;
+    }
+
+    // ------------------------------------------------------------
+    // ၁။ ဖုန်းဗားရှင်း / PC ဗားရှင်း ပြောင်းလဲမှု
+    // ------------------------------------------------------------
+    function applyDeviceLayout(mode) {
+      const text = document.getElementById('deviceToggleText');
+      const icon = document.getElementById('deviceToggleIcon');
+      const meta = document.getElementById('viewportMeta');
+
+      if (mode === 'desktop') {
+        document.body.classList.add('forced-desktop');
+        text.innerText = "Phone ဗားရှင်း";
+        icon.className = "fa-solid fa-mobile-screen";
+        meta.setAttribute('content', 'width=1200, user-scalable=yes');
+        showToast("ကွန်ပြူတာဗားရှင်း", "Desktop View အပြည့်အစုံသို့ ပြောင်းလိုက်ပါပြီ", "info");
+      } else {
+        document.body.classList.remove('forced-desktop');
+        text.innerText = "PC ဗားရှင်း";
+        icon.className = "fa-solid fa-desktop";
+        meta.setAttribute('content', 'width=device-width, initial-scale=1.0');
+        showToast("ဖုန်းဗားရှင်း", "Mobile View သို့ ပြောင်းလိုက်ပါပြီ", "info");
+      }
+      localStorage.setItem(LAYOUT_MODE_KEY, mode);
+    }
+
+    function toggleDeviceLayout() {
+      const current = localStorage.getItem(LAYOUT_MODE_KEY) || 'mobile';
+      const target = current === 'mobile' ? 'desktop' : 'mobile';
+      applyDeviceLayout(target);
+    }
+
+    // ------------------------------------------------------------
+    // ၂။ THEME ENGINE (DARK / LIGHT)
+    // ------------------------------------------------------------
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      const icon = document.getElementById('themeToggleIcon');
+      icon.className = isDark ? "fa-solid fa-moon text-blue-500" : "fa-solid fa-sun text-amber-500";
+      localStorage.setItem(THEME_STORAGE_KEY, isDark ? 'dark' : 'light');
+    }
+
+    function initTheme() {
+      const savedTheme = localStorage.getItem(THEME_STORAGE_KEY) || 'dark';
+      if (savedTheme === 'light') {
+        document.documentElement.classList.remove('dark');
+        document.getElementById('themeToggleIcon').className = "fa-solid fa-sun text-amber-500";
+      } else {
+        document.documentElement.classList.add('dark');
+        document.getElementById('themeToggleIcon').className = "fa-solid fa-moon text-blue-500";
+      }
+
+      const savedLayout = localStorage.getItem(LAYOUT_MODE_KEY) || 'mobile';
+      if (savedLayout === 'desktop') {
+        applyDeviceLayout('desktop');
+      }
+    }
+
+    // ------------------------------------------------------------
+    // ၃။ TOAST ALERT
+    // ------------------------------------------------------------
+    function showToast(title, msg, type = 'success') {
+      const toast = document.getElementById('toastAlert');
+      const iconBox = document.getElementById('toastIconBox');
+      const icon = document.getElementById('toastIcon');
+
+      document.getElementById('toastTitle').innerText = title;
+      document.getElementById('toastMessage').innerText = msg;
+
+      if (type === 'error') {
+        iconBox.className = 'w-10 h-10 rounded-xl bg-rose-500/15 text-rose-500 flex items-center justify-center text-lg shrink-0';
+        icon.className = 'fa-solid fa-circle-xmark';
+      } else if (type === 'info') {
+        iconBox.className = 'w-10 h-10 rounded-xl bg-blue-500/15 text-blue-500 flex items-center justify-center text-lg shrink-0';
+        icon.className = 'fa-solid fa-circle-info';
+      } else {
+        iconBox.className = 'w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-500 flex items-center justify-center text-lg shrink-0';
+        icon.className = 'fa-solid fa-circle-check';
+      }
+
+      toast.classList.remove('translate-x-full');
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => toast.classList.add('translate-x-full'), 3000);
+    }
+
+    // ------------------------------------------------------------
+    // ၄။ ALL-USERS FIREBASE REALTIME CLOUD CONTROLLER
+    // ------------------------------------------------------------
+    async function fetchCloudData() {
+      try {
+        let url = `${FIREBASE_DB_URL}.json`;
+        if (adminIdToken) url += '?auth=' + encodeURIComponent(await getAdminToken());
+        const res = await fetch(url, {cache:'no-store'});
+        if (!res.ok) {
+          let reason = '';
+          try { const payload = await res.json(); reason = payload.error || ''; } catch (_) {}
+          throw new Error('Firebase HTTP ' + res.status + (reason ? ': ' + reason : '') + (res.status === 401 ? ' — Admin Login / Database Rules စစ်ဆေးပါ' : ''));
+        }
+        const data = await res.json();
+        if (!data) return;
+
+        // Maintenance
+        if (data.site_maintenance !== undefined) {
+          const isMaint = data.site_maintenance === true || data.site_maintenance === 'true';
+          document.getElementById('preMaintToggle').checked = isMaint;
+          updateMaintUI(isMaint);
+        }
+        if (data.site_maintenance_msg) {
+          document.getElementById('maintNoticeText').value = data.site_maintenance_msg;
+        }
+        if (data.maint_est_time) {
+          document.getElementById('maintEstimatedTime').value = data.maint_est_time;
+        }
+
+        // Version Update
+        if (data.app_version_config) {
+          if (data.app_version_config.latestVersion) {
+            document.getElementById('newVerInput').value = data.app_version_config.latestVersion;
+          }
+          if (data.app_version_config.updateMessage) {
+            document.getElementById('updateMsgInput').value = data.app_version_config.updateMessage;
+          }
+        }
+
+        // Brand & Logo
+        if (data.site_platform_config) {
+          document.getElementById('brandNameInput').value = data.site_platform_config.name || 'KAVXY';
+          document.getElementById('brandLogoInput').value = data.site_platform_config.logo || '';
+          if (data.site_platform_config.name) {
+            document.getElementById('sidebarBrandName').innerText = data.site_platform_config.name;
+          }
+        }
+
+      } catch (err) {
+        showToast('Cloud ချိတ်ဆက်မှု မအောင်မြင်ပါ', 'Firebase ဒေတာ ဖတ်၍မရပါ: ' + err.message, 'error');
+      }
+    }
+
+    function updateMaintUI(status) {
+      const panel = document.getElementById('maintSettingsPanel');
+      const badge = document.getElementById('maintStatusBadge');
+      const icon = document.getElementById('maintStatusIcon');
+
+      if (status) {
+        panel.classList.remove('hidden');
+        badge.className = 'px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-500/15 text-amber-500 border border-amber-500/30 animate-pulse';
+        badge.innerText = 'MAINTENANCE ON';
+        icon.className = 'w-10 h-10 rounded-xl bg-amber-500/20 text-amber-500 flex items-center justify-center text-lg animate-bounce';
+      } else {
+        panel.classList.add('hidden');
+        badge.className = 'px-2 py-0.5 rounded-full text-[9px] font-bold bg-slate-100 dark:bg-white/5 text-slate-400';
+        badge.innerText = 'OFFLINE';
+        icon.className = 'w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-400 flex items-center justify-center text-lg';
+      }
+    }
+
+    // Authenticated writes; public read rules are configured separately.
+    async function cloudWrite(path, value) {
+      const token = await getAdminToken();
+      const response = await fetch(`${FIREBASE_DB_URL}${path}.json?auth=${encodeURIComponent(token)}`, {
+        method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(value)
+      });
+      if (!response.ok) {
+        let detail = ''; try { const body = await response.json(); detail = body.error || ''; } catch (_) {}
+        throw new Error(`Firebase HTTP ${response.status}${detail ? ': ' + detail : ''}`);
+      }
+      return response.json();
+    }
+
+    let maintenanceWriteBusy = false;
+    async function togglePreMaint(status) {
+      const toggle = document.getElementById('preMaintToggle');
+      if (maintenanceWriteBusy) return;
+      maintenanceWriteBusy = true;
+      toggle.disabled = true;
+      const previous = !status;
+      try {
+        await cloudWrite('site_maintenance', status);
+        updateMaintUI(status);
+        showToast(status ? 'Maintenance ဖွင့်ပြီးပါပြီ' : 'Maintenance ပိတ်ပြီးပါပြီ', status ? 'User များ ဝင်မရတော့ပါ' : 'User များ ပုံမှန်သုံးနိုင်ပါပြီ');
+      } catch (e) {
+        toggle.checked = previous;
+        updateMaintUI(previous);
+        showToast('Cloud Write Error', e.message, 'error');
+      } finally {
+        maintenanceWriteBusy = false;
+        toggle.disabled = false;
+      }
+    }
+
+    async function savePreMaintConfig() {
+      const msg = document.getElementById('maintNoticeText').value.trim();
+      const time = document.getElementById('maintEstimatedTime').value.trim();
+      try {
+        await cloudWrite('site_maintenance_msg', msg);
+        await cloudWrite('maint_est_time', time);
+        showToast('အောင်မြင်ပါသည်', 'Maintenance အချက်အလက်များ သိမ်းဆည်းပြီးပါပြီ');
+      } catch (e) {
+        showToast('Cloud Write Error', e.message, 'error');
+      }
+    }
+
+    async function pushVersionUpdate() {
+      const ver = document.getElementById('newVerInput').value.trim();
+      const msg = document.getElementById('updateMsgInput').value.trim();
+      if (!ver) return showToast('လိုအပ်ချက်', 'ဗားရှင်းအသစ် နံပါတ် ထည့်ပေးပါ', 'error');
+
+      try {
+        await cloudWrite('app_version_config', { latestVersion: ver, updateMessage: msg });
+        showToast('Update လွှင့်တင်ပြီးပါပြီ', `All Users ထံ Version ${ver} Alert ပေါ်သွားပါပြီ`);
+      } catch (e) {
+        showToast('Cloud Write Error', e.message, 'error');
+      }
+    }
+
+    async function saveBrandSettings() {
+      const name = document.getElementById('brandNameInput').value.trim();
+      const logo = document.getElementById('brandLogoInput').value.trim();
+      if (logo) {
+        try { if (new URL(logo).protocol !== 'https:') throw new Error(); }
+        catch (_) { return showToast('Logo URL', 'HTTPS URL မှန်ကန်စွာ ထည့်ပါ', 'error'); }
+      }
+
+      try {
+        await cloudWrite('site_platform_config', { name: name || 'KAVXY', logo: logo || '' });
+        showToast('အောင်မြင်ပါသည်', 'Brand အမည်နှင့် Logo အား သိမ်းဆည်းပြီးပါပြီ');
+      } catch (e) {
+        showToast('Cloud Write Error', e.message, 'error');
+      }
+    }
+
+    // ------------------------------------------------------------
+    // ၅။ CHARTS INITIALIZATION
+    // ------------------------------------------------------------
+    function initCharts() {
+      const ctxOverview = document.getElementById('orderOverviewChart').getContext('2d');
+      new Chart(ctxOverview, {
+        type: 'line',
+        data: {
+          labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          datasets: [{
+            data: [45, 80, 95, 150, 130, 120, 190],
+            borderColor: '#38bdf8',
+            backgroundColor: 'rgba(56, 189, 248, 0.15)',
+            fill: true,
+            tension: 0.4,
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 10 } } },
+            y: { grid: { color: 'rgba(148, 163, 184, 0.1)' }, ticks: { color: '#94a3b8', font: { size: 10 } } }
+          }
+        }
+      });
+
+      const ctxTypes = document.getElementById('gameTypesChart').getContext('2d');
+      new Chart(ctxTypes, {
+        type: 'doughnut',
+        data: {
+          labels: ['MLBB', 'PUBG', 'Free Fire', 'Other'],
+          datasets: [{
+            data: [56, 25, 11, 8],
+            backgroundColor: ['#3b82f6', '#eab308', '#10b981', '#a855f7'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '72%',
+          plugins: { legend: { display: false } }
+        }
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initTheme();
+      if (typeof Chart !== 'undefined') initCharts();
+      else showToast('Chart မရနိုင်ပါ', 'Chart.js မတင်နိုင်သေးပါ', 'error');
+      document.getElementById('firebaseApiKey').value = sessionStorage.getItem('kavxy_firebase_api_key') || '';
+      fetchCloudData();
+    });
+  </script>
+
+  <!-- Embedded Firebase setup instructions: no separate SETUP.txt required -->
+  <section id="firebaseSetupGuide" style="max-width:1000px;margin:24px auto 110px;padding:20px;border:1px solid rgba(125,211,252,.25);border-radius:20px;background:#0e1629;color:#e2e8f0;font-family:inherit;">
+    <details>
+      <summary style="cursor:pointer;font-size:15px;font-weight:800;color:#7dd3fc;">⚙️ Firebase SETUP Guide (Admin ဖိုင်ထဲတွင် ပါဝင်သည်)</summary>
+      <p style="font-size:12px;color:#fbbf24;line-height:1.8;margin-top:12px;">Admin Account နှင့် Database Rules မသတ်မှတ်ရသေးပါက Cloud Write အလုပ်လုပ်မည်မဟုတ်ပါ။</p>
+      <pre style="white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;line-height:1.9;color:#cbd5e1;margin-top:12px;">KAVXY Admin + Index Maintenance Sync
+
+1. Firebase Console &gt; Authentication &gt; Sign-in method: enable Email/Password.
+2. Create an admin user under Authentication &gt; Users. Copy its UID.
+3. Firebase Console &gt; Project settings &gt; General &gt; Web API Key. Enter it in admin.html Firebase Admin Login.
+4. Set Realtime Database rules to allow PUBLIC READ ONLY for the maintenance fields and AUTHENTICATED ADMIN UID WRITE ONLY. Merge these paths with existing rules carefully; do not replace unrelated application rules blindly.
+
+EXAMPLE RULES SNIPPET (merge at root under rules; replace YOUR_ADMIN_UID):
+&quot;site_maintenance&quot;: { &quot;.read&quot;: true, &quot;.write&quot;: &quot;auth != null &amp;&amp; auth.uid === &#x27;YOUR_ADMIN_UID&#x27;&quot; },
+&quot;site_maintenance_msg&quot;: { &quot;.read&quot;: true, &quot;.write&quot;: &quot;auth != null &amp;&amp; auth.uid === &#x27;YOUR_ADMIN_UID&#x27;&quot; },
+&quot;maint_est_time&quot;: { &quot;.read&quot;: true, &quot;.write&quot;: &quot;auth != null &amp;&amp; auth.uid === &#x27;YOUR_ADMIN_UID&#x27;&quot; },
+&quot;app_version_config&quot;: { &quot;.read&quot;: true, &quot;.write&quot;: &quot;auth != null &amp;&amp; auth.uid === &#x27;YOUR_ADMIN_UID&#x27;&quot; },
+&quot;site_platform_config&quot;: { &quot;.read&quot;: true, &quot;.write&quot;: &quot;auth != null &amp;&amp; auth.uid === &#x27;YOUR_ADMIN_UID&#x27;&quot; }
+
+IMPORTANT: If your root .read is false, admin.html&#x27;s original root fetch may fail. The maintenance controls can still write individual paths with auth, and index.html polls the maintenance field separately. Existing root-based sync may need separately scoped reads or appropriate rules. Do NOT enable global .write:true.
+
+5. Host both updated admin.html and index.html on the same site. Login from Admin panel, toggle Maintenance ON, then open index.html on another device. Turn OFF to restore.
+6. Errors now show actual HTTP code / Firebase message in Admin Toast.
+7. API key is a public Firebase project identifier, NOT an admin password. Never share your admin password. Password is not stored in localStorage.
+8. No Firebase project configuration or security rules have been modified automatically. Live integration needs testing with your real project.
+</pre>
+    </details>
+  </section>
+</body>
+</html>
