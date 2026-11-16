@@ -1301,7 +1301,7 @@
     ];
 
     function getAllGames() {
-      return JSON.parse(localStorage.getItem('admin_games')) || DEFAULT_GAMES;
+      const raw=localStorage.getItem('admin_games'); if(raw!==null){try{const data=JSON.parse(raw);if(Array.isArray(data))return data;}catch(_){}} return DEFAULT_GAMES;
     }
 
     function renderGames(gamesList) {
@@ -1458,6 +1458,58 @@ document.addEventListener('click',function(e){
 window.addEventListener('message',function(e){if(e.source===frame.contentWindow&&e.data&&typeof e.data.kavxyNavigate==='string')navigate(e.data.kavxyNavigate);});
 window.addEventListener('popstate',function(){const n=location.hash.slice(1);if(pages[n]){overlay.style.display='block';frame.srcdoc=pages[n];}else{overlay.style.display='none';frame.removeAttribute('srcdoc');}});
 const initial=location.hash.slice(1);if(pages[initial]){overlay.style.display='block';frame.srcdoc=pages[initial];}
+})();
+</script>
+<script>
+/* KAVXY Firebase realtime synchronization: public read paths admin_games and admin_carousel_banners */
+(()=>{
+ const DB="https://kavxygameshop-default-rtdb.asia-southeast1.firebasedatabase.app/";
+ const syncState={games:null,banners:null};
+ function updateGames(value){
+   let games=Array.isArray(value)?value.filter(Boolean):(value&&typeof value==='object'?Object.values(value).filter(Boolean):[]);
+   syncState.games=games;
+   try{localStorage.setItem('admin_games',JSON.stringify(games));}catch(_){}
+   if(typeof renderGames==='function') renderGames(games);
+ }
+ function updateBanners(value){
+   const banners=Array.isArray(value)?value.filter(Boolean):(value&&typeof value==='object'?Object.values(value).filter(Boolean):[]);
+   syncState.banners=banners;
+   try{localStorage.setItem('admin_carousel_banners_db',JSON.stringify(banners));}catch(_){}
+   document.querySelectorAll('.banner-slide').forEach((slide,i)=>{
+     const b=banners[i];slide.style.display=b?'':'none';
+     if(!b)return;
+     const img=document.getElementById('bannerImg_'+i),title=document.getElementById('bannerTitle_'+i),tag=document.getElementById('bannerTag_'+i);
+     if(img&&typeof b.image==='string')img.src=b.image;
+     if(title)title.textContent=b.title||'';
+     if(tag)tag.textContent=b.tag||'';
+   });
+ }
+ function subscribe(path,apply){
+   let source=null, retry=1500;
+   const connect=()=>{
+     source=new EventSource(DB+path+'.json');
+     source.addEventListener('put',ev=>{
+       try{
+         const message=JSON.parse(ev.data);
+         if(message.path==='/')apply(message.data);
+         else refresh();
+       }catch(e){console.warn('Realtime data:',e)}
+     });
+     source.addEventListener('patch',()=>refresh());
+     source.onopen=()=>{retry=1500};
+     source.onerror=()=>{if(source){source.close();source=null}setTimeout(connect,retry);retry=Math.min(retry*2,30000)};
+   };
+   const refresh=async()=>{
+     try{const res=await fetch(DB+path+'.json',{cache:'no-store'});if(res.ok)apply(await res.json());else console.warn('Firebase read denied',path,res.status)}catch(e){console.warn(e)}
+   };
+   refresh();connect();
+ }
+ subscribe('admin_games',updateGames);
+ subscribe('admin_carousel_banners',updateBanners);
+ window.addEventListener('storage',e=>{
+   if(e.key==='admin_games'&&e.newValue){try{updateGames(JSON.parse(e.newValue))}catch(_){}}
+   if(e.key==='admin_carousel_banners_db'&&e.newValue){try{updateBanners(JSON.parse(e.newValue))}catch(_){}}
+ });
 })();
 </script>
 </body>
